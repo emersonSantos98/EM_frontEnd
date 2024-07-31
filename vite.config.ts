@@ -1,4 +1,6 @@
 import { fileURLToPath } from 'node:url'
+import fs from 'node:fs'
+import path from 'node:path'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -48,6 +50,14 @@ export default defineConfig({
     }),
     DefineOptions(),
   ],
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27-key.pem')),
+      cert: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27.pem')),
+    },
+    host: '192.168.18.27',
+    port: 5173,
+  },
   define: { 'process.env': {} },
   resolve: {
     alias: {
