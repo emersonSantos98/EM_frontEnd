@@ -18,7 +18,7 @@ const router = createRouter({
         if (userRole === 'admin')
           return { name: 'index' }
         if (userRole === 'user')
-          return { name: 'second-page' }
+          return { name: 'calculator-prices-marketplaces' }
 
         return { name: 'login', query: to.query }
       },

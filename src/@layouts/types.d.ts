@@ -6,7 +6,6 @@ export interface UserConfig {
   app: {
     title: string
     logo: VNode
-    logo1: VNode
     contentWidth: typeof ContentWidth[keyof typeof ContentWidth]
     contentLayoutNav: typeof AppContentLayoutNav[keyof typeof AppContentLayoutNav]
     overlayNavFromBreakpoint: number

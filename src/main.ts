@@ -14,8 +14,7 @@ import router from '@/router'
 import '@core/scss/template/index.scss'
 import '@styles/styles.scss'
 import { useAuthStore } from '@/store/auth'
-import index from '/src/pages/index.vue'  
-
+import index from '/src/pages/index.vue'
 
 loadFonts()
 
@@ -32,8 +31,7 @@ app.use(pinia)
 app.use(vuetify)
 app.use(router)
 app.use(layoutsPlugin)
-app.use(i18n) 
-
+app.use(i18n)
 
 app.config.globalProperties.$filters = filtersGlobal
 
@@ -64,19 +62,19 @@ if(localStorage.getItem('accessToken')) {
   })()
 }
 
-const routes = [
-  {
-    path: '/',
-    name: 'index ',
-    component: index,
-    props: (route: any) => ({
-      accessToken: route.query.access_token,
-      user: JSON.parse(route.query.user),
-    }),
-  },
-
-  // outras rotas
-]
+// const routes = [
+//   {
+//     path: '/',
+//     name: 'index ',
+//     component: index,
+//     props: (route: any) => ({
+//       accessToken: route.query.access_token,
+//       user: JSON.parse(route.query.user),
+//     }),
+//   },
+//
+//   // outras rotas
+// ]
 
 // Mount vue app
 app.mount('#app')
