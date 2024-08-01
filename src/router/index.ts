@@ -14,19 +14,21 @@ const router = createRouter({
       redirect: to => {
         const userData = JSON.parse(localStorage.getItem('userData') || '{}')
         const userRole = userData && userData.role ? userData.role : null
-
+        console.log('userRole', userRole === 'user')
         if (userRole === 'admin')
           return { name: 'index' }
         if (userRole === 'user')
-          return { name: 'second-page' }
+          return { name: 'index' }
 
         return { name: 'login', query: to.query }
       },
     },
-    ...setupLayouts([...routes]),
+    ...setupLayouts(routes),
   ],
 
+
 })
+
 
 router.beforeEach(async (to, from, next) => {
   const isLoggedIn = isUserLoggedIn()
@@ -50,6 +52,13 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
+
+
 // Docs: https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
 
 export default router
+
+
+
+
+
