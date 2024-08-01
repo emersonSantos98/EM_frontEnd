@@ -25,6 +25,7 @@ export const defineThemeConfig = (
       app: {
         title: userConfig.app.title,
         logo: userConfig.app.logo,
+        logo1: userConfig.app.logo1,
         contentWidth: ref(userConfig.app.contentWidth),
         contentLayoutNav: ref(userConfig.app.contentLayoutNav),
         overlayNavFromBreakpoint: userConfig.app.overlayNavFromBreakpoint,

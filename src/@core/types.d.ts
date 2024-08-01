@@ -6,6 +6,7 @@ export interface UserThemeConfig {
   app: {
     title: UserLayoutConfig['app']['title']
     logo: UserLayoutConfig['app']['logo']
+    logo1: UserLayoutConfig['app']['logo1']
     contentWidth: UserLayoutConfig['app']['contentWidth']
     contentLayoutNav: UserLayoutConfig['app']['contentLayoutNav']
     overlayNavFromBreakpoint: UserLayoutConfig['app']['overlayNavFromBreakpoint']
@@ -50,6 +51,7 @@ export interface ThemeConfig {
   app: {
     title: UserThemeConfig['app']['title']
     logo: UserThemeConfig['app']['logo']
+    logo1: UserThemeConfig['app']['logo1']
     contentWidth: Ref<UserThemeConfig['app']['contentWidth']>
     contentLayoutNav: Ref<UserThemeConfig['app']['contentLayoutNav']>
     overlayNavFromBreakpoint: UserThemeConfig['app']['overlayNavFromBreakpoint']
