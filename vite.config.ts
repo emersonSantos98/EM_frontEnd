@@ -15,16 +15,19 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   console.log('mode:', mode)
+
   const isDev = mode === 'development'
 
-  const serverConfig = isDev ? {
-    https: {
-      key: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27-key.pem')),
-      cert: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27.pem')),
-    },
-    host: '192.168.18.27',
-    port: 5173,
-  } : {}
+  const serverConfig = isDev
+    ? {
+      https: {
+        key: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27-key.pem')),
+        cert: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27.pem')),
+      },
+      host: '192.168.18.27',
+      port: 5173,
+    }
+    : { port: 5173 }
 
   return {
     plugins: [
