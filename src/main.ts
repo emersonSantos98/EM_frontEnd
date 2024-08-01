@@ -60,19 +60,19 @@ if (localStorage.getItem('accessToken')) {
   })()
 }
 
-const routes = [
-  {
-    path: '/',
-    name: 'index ',
-    component: index,
-    props: (route: any) => ({
-      accessToken: route.query.access_token,
-      user: JSON.parse(route.query.user),
-    }),
-  },
-
-  // outras rotas
-]
+// const routes = [
+//   {
+//     path: '/',
+//     name: 'index ',
+//     component: index,
+//     props: (route: any) => ({
+//       accessToken: route.query.access_token,
+//       user: JSON.parse(route.query.user),
+//     }),
+//   },
+//
+//   // outras rotas
+// ]
 
 // Mount vue app
 app.mount('#app')
