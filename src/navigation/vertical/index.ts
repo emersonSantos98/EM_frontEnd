@@ -1,16 +1,16 @@
 import home from './home'
-import calculator from './calculator'
+import secondPage from './secondPage'
 import rolePermissions from './role&Permissions'
 import profile from './profile'
-import product from './product'
-import reorderLabels from './reorderLabels'
+import generateTagZebra from './generateTagZebra'
+import generateTagShein from './generateTagShein'
 import type { VerticalNavItems } from '@/@layouts/types'
 
 export default [
   ...home,
-  ...calculator,
+  ...secondPage,
   ...rolePermissions,
   ...profile,
-  ...product,
-  ...reorderLabels,
+  ...generateTagZebra,
+  ...generateTagShein
 ] as VerticalNavItems
