@@ -1,25 +1,25 @@
 <script lang="ts" setup>
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type { VForm } from "vuetify/components/VForm";
-import { requiredValidator } from "@validators";
-import { useProfileStore } from "@/views/apps/myProfile/ProfileStore";
-import type { ProfileParams } from "@/views/apps/myProfile/types";
+import type { VForm } from 'vuetify/components/VForm'
+import { requiredValidator } from '@validators'
+import { useProfileStore } from '@/views/apps/myProfile/ProfileStore'
+import type { ProfileParams } from '@/views/apps/myProfile/types'
 
-const name = ref("");
-const email = ref("");
-const document = ref("");
-const cellphone = ref("");
-const refForm = ref<VForm>();
+const name = ref('')
+const email = ref('')
+const document = ref('')
+const cellphone = ref('')
+const refForm = ref<VForm>()
 
-const profileStore = useProfileStore();
+const profileStore = useProfileStore()
 
 async function findOne() {
-  const { data } = await profileStore.findOne();
+  const { data } = await profileStore.findOne()
 
-  name.value = data.name;
-  email.value = data.email;
-  cellphone.value = data.cellphone;
-  document.value = data.document;
+  name.value = data.name
+  email.value = data.email
+  cellphone.value = data.cellphone
+  document.value = data.document
 }
 
 async function update() {
@@ -28,29 +28,42 @@ async function update() {
     email: email.value,
     cellphone: cellphone.value,
     document: document.value,
-  };
+  }
 
-  await profileStore.update(Paramns);
-  findOne();
+  await profileStore.update(Paramns)
+  findOne()
 }
 
 onMounted(() => {
   // findOne()
-});
+})
 
 watchEffect(() => {
-  findOne();
-});
+  findOne()
+})
 </script>
 
 <template>
   <VRow>
-    <VCol cols="12">
-      <VCard :title="$t('My Profile')" :loading="profileStore.loading">
-        <VForm ref="refForm" @submit.prevent="() => {}">
-          <VCardText class="pt-0">
+    <VCol
+      cols="12"
+    >
+      <VCard
+        :title="$t('My Profile')"
+        :loading="profileStore.loading"
+      >
+        <VForm
+          ref="refForm"
+          @submit.prevent="() => {}"
+        >
+          <VCardText
+            class="pt-0"
+          >
             <VRow>
-              <VCol cols="12" md="6">
+              <VCol
+                cols="12"
+                md="6"
+              >
                 <AppTextField
                   v-model="name"
                   placeholder="Nome Completo"
@@ -60,7 +73,10 @@ watchEffect(() => {
                 />
               </VCol>
 
-              <VCol cols="12" md="6">
+              <VCol
+                cols="12"
+                md="6"
+              >
                 <AppTextField
                   v-model="cellphone"
                   v-mask="'(##) #####-####'"
@@ -71,7 +87,10 @@ watchEffect(() => {
                 />
               </VCol>
 
-              <VCol cols="12" md="6">
+              <VCol
+                cols="12"
+                md="6"
+              >
                 <AppTextField
                   v-model="email"
                   placeholder="Email"
@@ -82,10 +101,13 @@ watchEffect(() => {
                 />
               </VCol>
 
-              <VCol cols="12" md="6">
+              <VCol
+                cols="12"
+                md="6"
+              >
                 <AppTextField
                   v-model="document"
-                  v-mask="('###.###.###-##', '##.###.###/####-##')"
+                  v-mask="'###.###.###-##', '##.###.###/####-##'"
                   placeholder="Documento"
                   persistent-placeholder
                   :rules="[requiredValidator]"
@@ -96,15 +118,10 @@ watchEffect(() => {
                 <VBtn
                   type="Submit"
                   :loading="profileStore.loading"
-                  :disabled="
-                    name === '' ||
-                    email === '' ||
-                    cellphone === '' ||
-                    document === ''
-                  "
+                  :disabled="name === '' || email === '' || cellphone === '' || document === ''"
                   @click="refForm?.validate() && update()"
                 >
-                  {{ $t("Save") }}
+                  {{ $t('Save') }}
                 </VBtn>
               </VCol>
             </VRow>
@@ -115,7 +132,9 @@ watchEffect(() => {
   </VRow>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+
+</style>
 <route lang="yaml">
 meta:
 action: read

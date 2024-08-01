@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import type { OrganizationParams, AddressParams } from '@/views/apps/organization/types'
-import {  findOne, update, updateAdress, createAdress }  from  '@/api/Organization/organization.client'
-import {  findCep }  from  '@/api/ViaCep/viaCep.client'
-import {clearCaracters} from '@/@core/utils/helpers'
+import type { AddressParams, OrganizationParams } from '@/views/apps/organization/types'
+import { createAdress, findOne, update, updateAdress } from '@/api/Organization/organization.client'
+import { findCep } from '@/api/ViaCep/viaCep.client'
+import { clearCaracters } from '@/@core/utils/helpers'
 import Notifier from '@core/utils/Notifier'
 
 const notifier = new Notifier()
@@ -13,9 +13,9 @@ export const useOrganizationStore = defineStore('OrganizationStore', {
     loading: false,
   }),
 
-    // getters: {
-    //   loading: (state) => state.loading,
-    // },
+  // getters: {
+  //   loading: (state) => state.loading,
+  // },
 
   actions: {
     // 👉 Fetch users data
@@ -54,7 +54,7 @@ export const useOrganizationStore = defineStore('OrganizationStore', {
     },
 
     async findCep(cep: string) {
-        cep = clearCaracters(cep)
+      cep = clearCaracters(cep)
       try {
         this.loading = true
 
@@ -67,7 +67,7 @@ export const useOrganizationStore = defineStore('OrganizationStore', {
       catch (err) {
         throw new Error(err.message)
       }
-    }
+    },
 
   },
 })
@@ -81,21 +81,21 @@ export const useAdressStore = defineStore('AdressStore', {
   actions: {
 
     async create(data: AddressParams) {
-        try {
-            this.loading = true
+      try {
+        this.loading = true
 
-            const response = await createAdress(data)
+        const response = await createAdress(data)
 
-            if (response.status === 201) {
-            notifier.success('Adress created successfully')
-            this.loading = false
-            }
-
-            else { notifier.error('Something went wrong') }
+        if (response.status === 201) {
+          notifier.success('Adress created successfully')
+          this.loading = false
         }
-        catch (err) {
-            throw new Error(err.message)
-        }
+
+        else { notifier.error('Something went wrong') }
+      }
+      catch (err) {
+        throw new Error(err.message)
+      }
     },
 
     async update(data: AddressParams) {
