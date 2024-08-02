@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => {
       VueI18nPlugin({ runtimeOnly: true, compositionOnly: true, include: [fileURLToPath(new URL('./src/plugins/i18n/locales/**', import.meta.url))] }),
       DefineOptions(),
     ],
-  
+    server: serverConfig,
     define: { 'process.env': {} },
     resolve: {
       alias: {
