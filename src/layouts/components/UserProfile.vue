@@ -2,14 +2,13 @@
 import { initialAbility } from '@/plugins/casl/ability'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
 import { useAuthStore } from '@/store/auth'
-import {IUserDataDTO} from "@/modules/account/client/login/models/types";
 
 const router = useRouter()
 
 const ability = useAppAbility()
 const authUser = useAuthStore()
 
-const userData: IUserDataDTO = JSON.parse(localStorage.getItem('userData') || 'null')
+const userData = JSON.parse(localStorage.getItem('userData') || 'null')
 
 function logout() {
   // Remove "userData" from localStorage
@@ -84,30 +83,16 @@ function logout() {
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-
-              {{ userData.first_name }}
-
+              {{ userData.full_name }}
             </VListItemTitle>
-            <VListItemSubtitle>{{ userData.role }}</VListItemSubtitle>
+            <VListItemSubtitle v-if="userData.role == 'admin'">{{ userData.role }}</VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
 
-          <!-- 👉 Profile -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="tabler-user"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Profile</VListItemTitle>
-          </VListItem>
 
           <!-- 👉 Settings -->
-          <VListItem link>
+          <VListItem link to="account/profile" >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -119,31 +104,7 @@ function logout() {
             <VListItemTitle>Settings</VListItemTitle>
           </VListItem>
 
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="tabler-currency-dollar"
-                size="22"
-              />
-            </template>
 
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 FAQ -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="tabler-help"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>FAQ</VListItemTitle>
-          </VListItem>
 
           <!-- Divider -->
           <VDivider class="my-2" />

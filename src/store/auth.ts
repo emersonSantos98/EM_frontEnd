@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '../router'
-import type { IUserDataDTO } from '@/modules/account/client/login/models/types'
 
 const baseURL = import.meta.env.VITE_API_URL as string
 export const useAuthStore = defineStore('auth', () => {
@@ -21,12 +20,12 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('refreshToken', refreshTokenValue)
     refreshToken.value = refreshTokenValue
   }
-  function setDadosTemporario(accessTokenValue:string , refreshTokenValue: string ,userAbilitiesValue:string ) {
+  function setDadosTemporario(accessTokenValue: string, refreshTokenValue: string, userAbilitiesValue: string) {
     localStorage.setItem('refreshTokenTemporario', accessTokenValue)
     localStorage.setItem('accessTokenTemporario', refreshTokenValue)
     localStorage.setItem('userAbilitiesTemporario', JSON.stringify(userAbilitiesValue))
   }
-  function setUser(userValue: IUserDataDTO) {
+  function setUser(userValue: object) {
     localStorage.setItem('userData', JSON.stringify(userValue))
     userData.value = userValue
   }
