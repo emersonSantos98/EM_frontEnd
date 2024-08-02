@@ -28,7 +28,7 @@ const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark);
 
 const isPasswordVisible = ref(false);
 
-const route = useRoute();
+
 const router = useRouter();
 
 const authService = new AuthService();
@@ -141,22 +141,23 @@ onMounted(() => {
                 </VBtn>
               </VCol>
 
+              <!-- auth providers -->
+              <VCol cols="12" class="text-center">
+                <AuthProvider />
+              </VCol>
+              <VCol cols="12" class="d-flex align-center">
+                <VDivider />
+                <span class="mx-4">ou</span>
+                <VDivider />
+              </VCol>
+
+
               <!-- create account -->
               <VCol cols="12" class="text-center">
                 <span>Novo na Plataforma?</span>
                 <RouterLink :to="{ name: 'register' }">
-                  Cria uma conta
+                  Cadastrar
                 </RouterLink>
-              </VCol>
-              <VCol cols="12" class="d-flex align-center">
-                <VDivider />
-                <span class="mx-4">or</span>
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol cols="12" class="text-center">
-                <AuthProvider />
               </VCol>
             </VRow>
           </VForm>
