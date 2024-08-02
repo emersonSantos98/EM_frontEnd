@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       host: '192.168.18.27',
       port: 5173,
     }
-    : { port: 5173 }
+    : {  }
 
   return {
     plugins: [
