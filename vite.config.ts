@@ -15,6 +15,9 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 export default defineConfig(({ mode }) => {
   const isDev = mode === 'development'
 
+  // Usando variáveis de ambiente definidas no .env
+  const serverPort = process.env.PORT || 5173
+
   const serverConfig = isDev
     ? {
       https: {
@@ -26,7 +29,7 @@ export default defineConfig(({ mode }) => {
     }
     : {
       host: '0.0.0.0',
-      port: process.env.PORT || 5173,
+      port: serverPort,
     }
 
   return {
