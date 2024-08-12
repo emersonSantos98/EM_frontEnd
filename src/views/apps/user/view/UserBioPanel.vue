@@ -62,7 +62,7 @@ const resolveUserRoleVariant = (role: string) => {
 
 <template>
   <VRow>
-    <!-- SECTION User Details -->
+    <!-- SECTION user Details -->
     <VCol cols="12">
       <VCard v-if="props.userData">
         <VCardText class="text-center pt-15">
@@ -85,7 +85,7 @@ const resolveUserRoleVariant = (role: string) => {
             </span>
           </VAvatar>
 
-          <!-- 👉 User fullName -->
+          <!-- 👉 user fullName -->
           <h6 class="text-h4 mt-4">
             {{ props.userData.fullName }}
           </h6>
@@ -151,7 +151,7 @@ const resolveUserRoleVariant = (role: string) => {
             Details
           </p>
 
-          <!-- 👉 User Details list -->
+          <!-- 👉 user Details list -->
           <VList class="card-list mt-2">
             <VListItem>
               <VListItemTitle>

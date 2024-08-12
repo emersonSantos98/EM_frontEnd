@@ -39,7 +39,7 @@ const colors: any = {
   'create': { color: 'success', text: 'Users' },
   'manage': { color: 'warning', text: 'Manager' },
   'administrator': { color: 'primary', text: 'Administrator' },
-  'restricted-user': { color: 'error', text: 'Restricted User' },
+  'restricted-user': { color: 'error', text: 'Restricted user' },
 }
 
 async function fetchPermissions() {
@@ -146,7 +146,7 @@ function deletedPermission(permission: IPermission) {
               prepend-icon="tabler-plus"
               @click="isAddPermissionDialogVisible = true"
             >
-              {{ $t('Permission') }}
+              {{ $t('permission') }}
             </VBtn>
           </div>
         </VCardText>

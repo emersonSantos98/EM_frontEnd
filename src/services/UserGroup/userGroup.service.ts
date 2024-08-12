@@ -23,7 +23,7 @@ export default class UserGroupService {
     try {
       const userGroup = await this.client.postUserGroupCreate(dataBody);
       this.store.addUserGroup(userGroup);
-      this.notifier.success('User Group created successfully');
+      this.notifier.success('user Group created successfully');
     } catch (err: any) {
       throw this.notifier.error(err.message);
     } finally {
@@ -60,7 +60,7 @@ export default class UserGroupService {
     try {
       const userGroup = await this.client.putUserGroupUpdateId(id, dataBody);
       this.store.userGroup = userGroup;
-      this.notifier.success('User Group updated successfully');
+      this.notifier.success('user Group updated successfully');
     } catch (err: any) {
       throw this.notifier.error(err.message);
     } finally {
@@ -72,7 +72,7 @@ export default class UserGroupService {
     this.appLayout.setLoading(true);
     try {
       await this.client.deleteUserGroupDeleteId(id);
-      this.notifier.success('User Group deleted successfully');
+      this.notifier.success('user Group deleted successfully');
     } catch (err: any) {
       throw this.notifier.error(err.message);
     } finally {

@@ -32,10 +32,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<IEmit>()
 
-// 👉 Permission List
+// 👉 permission List
 const permissions = ref<IPermission[]>([
   {
-    name: 'User Management',
+    name: 'user Management',
     read: false,
     write: false,
     create: false,

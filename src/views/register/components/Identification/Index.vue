@@ -1,7 +1,8 @@
-<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import type {IFormIdentificationDTO} from '@/modules/account/list/register/models/types'
-import {min, requiredValidator} from '@validators'
+import { ref, watch } from 'vue'
+import type { IFormIdentificationDTO } from '@/modules/account/list/register/models/types'
+import { min, requiredValidator } from '@validators'
+import svgGoogle from '@/assets/images/iconify-svg/fa-google.svg'
 
 interface Props {
   currentStep?: number
@@ -10,21 +11,19 @@ interface Props {
 
 interface Emit {
   (e: 'update:currentStep', value: number): void
-
   (e: 'update:register-data', value: IFormIdentificationDTO): void
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<Emit>()
 
 const registerIdetificationDataLocal = ref(props.registerData)
 
-const updateAddressData = () => {
+function updateAddressData() {
   emit('update:register-data', registerIdetificationDataLocal.value)
 }
 
-const nextStep = () => {
+function nextStep() {
   updateAddressData()
   emit('update:currentStep', props.currentStep ? props.currentStep + 1 : 1)
 }
@@ -33,20 +32,20 @@ watch(() => props.currentStep, updateAddressData)
 
 const refForm = ref<VForm>()
 
-const handleSubmit = async () => {
-  const {valid} = await refForm.value?.validate()
-  if (valid) {
+async function handleSubmit() {
+  const { valid } = await refForm.value?.validate()
+  if (valid)
     nextStep()
-  }
+}
 
+function googleAuth() {
+  window.open('http://localhost:3030/api/v1/auth/google/callback', '_blank')
 }
 </script>
 
 <template>
   <VRow>
-    <VCol
-      cols="12"
-    >
+    <VCol cols="12">
       <h6 class="text-base font-weight-regular mb-4">
         {{ $t('title_register_identification') }}
       </h6>
@@ -62,13 +61,13 @@ const handleSubmit = async () => {
             sm="6"
           >
             <AppTextField
+              id="first_name"
               v-model="registerIdetificationDataLocal.first_name"
               name="first_name"
-              id="first_name"
               :label="$t('name')"
               :rules="[
                 requiredValidator(registerIdetificationDataLocal.first_name, $t('name')),
-                min(registerIdetificationDataLocal.first_name, 3, $t('name'))
+                min(registerIdetificationDataLocal.first_name, 3, $t('name')),
               ]"
             />
           </VCol>
@@ -81,45 +80,38 @@ const handleSubmit = async () => {
               :label="$t('surname')"
               :rules="[
                 requiredValidator(registerIdetificationDataLocal.last_name, $t('surname')),
-                min(registerIdetificationDataLocal.last_name, 3, $t('surname'))
+                min(registerIdetificationDataLocal.last_name, 3, $t('surname')),
               ]"
             />
           </VCol>
-
-
-          <VCol
-            cols="12"
-          >
+          <VCol cols="12">
             <AppTextField
               v-model="registerIdetificationDataLocal.cellphone"
-              :label="$t('cell_phone')"
               v-mask="['(##) #####-####', '(##) ####-####']"
+              :label="$t('cell_phone')"
               :rules="[requiredValidator(registerIdetificationDataLocal.cellphone, $t('cell_phone'))]"
             />
           </VCol>
-          <VCol
-            cols="12"
-          >
+          <VCol cols="12">
             <AppTextField
               v-model="registerIdetificationDataLocal.document"
-              :label="$t('document')"
               v-mask="['###.###.###-##', '##.###.###/####-##']"
+              :label="$t('document')"
               :rules="[requiredValidator(registerIdetificationDataLocal.document, $t('document'))]"
             />
           </VCol>
-
-          <VCol
-            cols="12"
-          >
+          <VCol cols="12">
             <AppTextField
               v-model="registerIdetificationDataLocal.birth_date"
-              :label="$t('birth_date')"
               v-mask="['##/##/####']"
+              :label="$t('birth_date')"
               :rules="[requiredValidator(registerIdetificationDataLocal.birth_date, $t('birth_date'))]"
             />
           </VCol>
-
-          <VCol cols="12" class="d-flex justify-space-between">
+          <VCol
+            cols="12"
+            class="d-flex justify-space-between"
+          >
             <VBtn
               type="reset"
               variant="outlined"
@@ -133,9 +125,33 @@ const handleSubmit = async () => {
             >
               {{ $t('continue') }}
             </VBtn>
+            <VBtn
+              variant="outlined"
+              size="x-large"
+              color="secondary"
+              @click="googleAuth"
+            >
+              <img
+                :src="svgGoogle"
+                alt="icon"
+                width="27"
+                height="27"
+              >
+              <span
+                class="text-black"
+                style="text-transform: capitalize;"
+              >Google</span>
+            </VBtn>
           </VCol>
         </VRow>
       </VForm>
     </VCol>
   </VRow>
 </template>
+
+<style scoped>
+.text-black {
+  color: rgb(0, 0, 0, 0.67) !important;
+  font-size: .875rem;
+}
+</style>

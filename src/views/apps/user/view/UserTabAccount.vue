@@ -121,7 +121,7 @@ const resolveUserProgressVariant = (progress: number) => {
           </div>
         </VCardText>
         <VDivider />
-        <!-- 👉 User Project List Table -->
+        <!-- 👉 user Project List Table -->
 
         <!-- SECTION Datatable -->
         <VDataTable

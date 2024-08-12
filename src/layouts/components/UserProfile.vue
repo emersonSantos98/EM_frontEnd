@@ -59,7 +59,7 @@ function logout() {
         offset="14px"
       >
         <VList>
-          <!-- 👉 User Avatar & Name -->
+          <!-- 👉 user Avatar & Name -->
           <VListItem>
             <template #prepend>
               <VListItemAction start>

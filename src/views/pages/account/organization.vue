@@ -57,7 +57,7 @@ const clickMe = () => {
 
 <template>
   <VRow>
-    <!-- SECTION User Details -->
+    <!-- SECTION user Details -->
     <VCol cols="12">
       <VCard>
         <VCardText>

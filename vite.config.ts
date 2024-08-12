@@ -15,16 +15,16 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 export default defineConfig(({ mode }) => {
   const isDev = mode === 'development'
 
-  // Usando variáveis de ambiente definidas no .env
   const serverPort = process.env.PORT || 5173
+  const serverHost = process.env.HOST || '192.168.18.27'
 
   const serverConfig = isDev
     ? {
-      https: {
+      http: {
         key: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27-key.pem')),
         cert: fs.readFileSync(path.resolve('C:/Users/emers/192.168.18.27.pem')),
       },
-      host: '192.168.18.27',
+      host: serverHost,
       port: 5173,
     }
     : {

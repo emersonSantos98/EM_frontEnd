@@ -164,7 +164,7 @@ function deleteUser(id: number) {
         class="text-no-wrap"
         @update:options="options = $event"
       >
-        <!-- User -->
+        <!-- user -->
         <template #item.user="{ item }">
           <div class="d-flex align-center">
             <VAvatar

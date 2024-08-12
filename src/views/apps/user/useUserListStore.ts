@@ -10,7 +10,7 @@ export const useUserListStore = defineStore('UserListStore', {
     // 👉 Fetch users data
     fetchUsers(params: UserParams) { return axios.get('/apps/users/list', { params }) },
 
-    // 👉 Add User
+    // 👉 Add user
     addUser(userData: UserProperties) {
       return new Promise((resolve, reject) => {
         axios.post('/apps/users/user', {
@@ -27,7 +27,7 @@ export const useUserListStore = defineStore('UserListStore', {
       })
     },
 
-    // 👉 Delete User
+    // 👉 Delete user
     deleteUser(id: number) {
       return new Promise((resolve, reject) => {
         axios.delete(`/apps/users/${id}`).then(response => resolve(response)).catch(error => reject(error))

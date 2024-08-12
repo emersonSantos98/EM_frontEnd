@@ -71,8 +71,8 @@ watch(props, () => {
             <AppTextField
               v-model="permissionName"
               density="compact"
-              :label="$t('Permission Name')"
-              :placeholder="$t('Enter Permission Name')"
+              :label="$t('permission Name')"
+              :placeholder="$t('Enter permission Name')"
             />
 
             <VBtn @click="onSubmit">

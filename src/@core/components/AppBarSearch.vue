@@ -89,7 +89,7 @@ const resolveCategories = (val: string) => {
     return 'Apps & Pages'
 
   if (val === 'userInterface')
-    return 'User Interface'
+    return 'user Interface'
 
   if (val === 'formsTables')
     return 'Forms Tables'

@@ -2,7 +2,7 @@ import {ref, reactive} from 'vue'
 import {defineStore} from 'pinia'
 import {IPermissionGroup} from "@types/types";
 
-export const usePermissionUserGroupStore = defineStore('PermissionUserGroup', () => {
+export const usePermissionUserGroupStore = defineStore('permissionUserGroup', () => {
     const permissionUserGroup = reactive<IPermissionGroup>({
       id_usergroup: null,
       id_permission: null,

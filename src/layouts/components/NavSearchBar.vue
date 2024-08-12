@@ -30,7 +30,7 @@ const suggestionGroups: SuggestionGroup[] = [
       { icon: 'tabler-chart-donut', title: 'Analytics', url: { name: 'dashboards-analytics' } },
       { icon: 'tabler-chart-bubble', title: 'CRM', url: { name: 'dashboards-crm' } },
       { icon: 'tabler-file', title: 'Invoice List', url: { name: 'apps-invoice-list' } },
-      { icon: 'tabler-users', title: 'User List', url: { name: 'apps-user-list' } },
+      { icon: 'tabler-users', title: 'user List', url: { name: 'apps-user-list' } },
     ],
   },
   {
@@ -43,7 +43,7 @@ const suggestionGroups: SuggestionGroup[] = [
     ],
   },
   {
-    title: 'User Interface',
+    title: 'user Interface',
     content: [
       { icon: 'tabler-letter-a', title: 'Typography', url: { name: 'pages-typography' } },
       { icon: 'tabler-square', title: 'Tabs', url: { name: 'components-tabs' } },

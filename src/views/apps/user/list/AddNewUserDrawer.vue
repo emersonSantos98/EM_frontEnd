@@ -68,7 +68,7 @@ const handleDrawerModelValueUpdate = (val: boolean) => {
   >
     <!-- 👉 Title -->
     <AppDrawerHeaderSection
-      :title="!userService.store.user.id ? $t('Add New User') : $t('Edit User')"
+      :title="!userService.store.user.id ? $t('Add New user') : $t('Edit user')"
       @cancel="closeNavigationDrawer"
     />
 

@@ -23,7 +23,7 @@ export default class PermissionService {
     try {
       const userGroup = await this.client.postPermissionCreate(dataBody);
       this.store.addPermission(userGroup);
-      this.notifier.success('User Group created successfully');
+      this.notifier.success('user Group created successfully');
     } catch (err: any) {
       throw this.notifier.error(err.message);
     } finally {
@@ -61,7 +61,7 @@ export default class PermissionService {
     try {
       const permission = await this.client.putPermissionUpdateId(id, dataBody);
       this.store.permission = permission;
-      this.notifier.success('User Group updated successfully');
+      this.notifier.success('user Group updated successfully');
     } catch (err: any) {
       throw this.notifier.error(err.message);
     } finally {
