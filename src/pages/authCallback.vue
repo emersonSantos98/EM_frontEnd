@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
 import Notifier from '@core/utils/Notifier'
+import api from '@axios'
 
 const notifier = new Notifier()
 const ability = useAppAbility()
@@ -13,15 +14,10 @@ const router = useRouter()
 onMounted(async () => {
   try {
     // Faz a requisição para verificar o sucesso do login
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/success`, {
-      credentials: 'include',
-    })
-
-    const result = await response.json()
-
+    const response = await api.get('/auth/login/success', { withCredentials: true })
+    const result = response.data
     if (result && !result.error) {
       const { user } = result
-
       ability.update(user.userAbilities as any)
       authUser.setUser(user.userData)
       authUser.setDadosTemporario(user.refreshToken, user.accessToken, user.userAbilities)
