@@ -18,6 +18,7 @@ onMounted(async () => {
     const result = response.data
     if (result && !result.error) {
       const { user } = result
+
       ability.update(user.userAbilities as any)
       authUser.setUser(user.userData)
       authUser.setDadosTemporario(user.refreshToken, user.accessToken, user.userAbilities)
