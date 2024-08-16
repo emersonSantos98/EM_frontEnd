@@ -2,6 +2,9 @@
 import { initialAbility } from '@/plugins/casl/ability'
 import { useAppAbility } from '@/plugins/casl/useAppAbility'
 import { useAuthStore } from '@/store/auth'
+import AuthService from '@/services/auth/auth.service'
+
+const authService = new AuthService()
 
 const router = useRouter()
 
@@ -10,7 +13,7 @@ const authUser = useAuthStore()
 
 const userData = JSON.parse(localStorage.getItem('userData') || 'null')
 
-function logout() {
+async function logout() {
   // Remove "userData" from localStorage
   authUser.clearLogout()
 
@@ -21,15 +24,9 @@ function logout() {
   localStorage.removeItem('refreshToken')
 
   // Redirect to login page
-  router.push('/login')
-    .then(() => {
-      // ℹ️ We had to remove abilities in then block because if we don't nav menu items mutation is visible while redirecting user to login page
-      // Remove "userAbilities" from localStorage
-      // localStorage.removeItem('userAbilities')
 
-      // Reset ability to initial ability
-      ability.update(initialAbility)
-    })
+  window.open(`${import.meta.env.VITE_API_URL}/auth/logout`, '_self')
+  ability.update(initialAbility)
 }
 </script>
 
@@ -48,7 +45,7 @@ function logout() {
       variant="tonal"
     >
       <VImg
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJUcZP8UWywZOYwpOUMcf4S6-HmAxHMIx4OA&usqp=CAU"
+        :src="userData.avatar"
       />
 
       <!-- SECTION Menu -->
@@ -75,7 +72,7 @@ function logout() {
                     variant="tonal"
                   >
                     <VImg
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJUcZP8UWywZOYwpOUMcf4S6-HmAxHMIx4OA&usqp=CAU"
+                      :src="userData.avatar"
                     />
                   </VAvatar>
                 </VBadge>
@@ -85,14 +82,18 @@ function logout() {
             <VListItemTitle class="font-weight-semibold">
               {{ userData.full_name }}
             </VListItemTitle>
-            <VListItemSubtitle v-if="userData.role == 'admin'">{{ userData.role }}</VListItemSubtitle>
+            <VListItemSubtitle v-if="userData.role == 'admin'">
+              {{ userData.role }}
+            </VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
 
-
           <!-- 👉 Settings -->
-          <VListItem link to="account/profile" >
+          <VListItem
+            link
+            to="account/profile"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -103,8 +104,6 @@ function logout() {
 
             <VListItemTitle>Settings</VListItemTitle>
           </VListItem>
-
-
 
           <!-- Divider -->
           <VDivider class="my-2" />

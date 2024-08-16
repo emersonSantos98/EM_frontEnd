@@ -26,29 +26,22 @@ export default class AuthService {
   async authLogin(formLogin: IFormLoginDTO = this.loginStore.formLogin): Promise<void> {
     this.loginStore.setLoading(true)
     try {
-      if (this.loginStore.rememberMyPassword) {
+      if (this.loginStore.rememberMyPassword)
         this.loginStore.saveRememberMyPassword()
-      } else {
+      else
         this.loginStore.removeRememberMyPassword()
-      }
-      const { refreshToken, accessToken, userData, userAbilities } = await this.client.postAuthLogin(formLogin)
-      if(userData.two_factor === 1){
-        this.ability.update(userAbilities as any)
-        this.authUser.setUser(userData)
-        this.authUser.setDadosTemporario(refreshToken,accessToken,userAbilities)
-      }
-      else{
-        this.ability.update(userAbilities as any)
-        this.authUser.setUser(userData)
-        this.authUser.setDadosTemporario(refreshToken,accessToken,userAbilities)
-        this.authUser.setToken(accessToken)
-        this.authUser.setRefreshToken(refreshToken)
-        this.authUser.setAbilities(userAbilities)
-        this.authUser.setIsAuth(true)
-        this.loginStore.resetFormLogin()
-        this.notifier.success('Login realizado com sucesso!')
-      }
 
+      const { refreshToken, accessToken, userData, userAbilities } = await this.client.postAuthLogin(formLogin)
+
+      this.ability.update(userAbilities as any)
+      this.authUser.setUser(userData)
+      this.authUser.setDadosTemporario(refreshToken, accessToken, userAbilities)
+      this.authUser.setToken(accessToken)
+      this.authUser.setRefreshToken(refreshToken)
+      this.authUser.setAbilities(userAbilities)
+      this.authUser.setIsAuth(true)
+      this.loginStore.resetFormLogin()
+      this.notifier.success('Login realizado com sucesso!')
     }
     catch (err: any) {
       throw this.notifier.error(err.message)
@@ -57,11 +50,13 @@ export default class AuthService {
       this.loginStore.setLoading(false)
     }
   }
+
   async codeValid(): Promise<void> {
     try {
       const refreshToken = localStorage.getItem('refreshTokenTemporario')
-      const accessToken =localStorage.getItem('accessTokenTemporario')
-      const userAbilities =  localStorage.getItem('userAbilitiesTemporario')
+      const accessToken = localStorage.getItem('accessTokenTemporario')
+      const userAbilities = localStorage.getItem('userAbilitiesTemporario')
+
       this.authUser.setToken(accessToken)
       this.authUser.setRefreshToken(refreshToken)
       this.authUser.setAbilities(userAbilities)
@@ -71,11 +66,12 @@ export default class AuthService {
       localStorage.removeItem('accessTokenTemporario')
       localStorage.removeItem('userAbilitiesTemporario')
       this.notifier.success('Login realizado com sucesso!')
-
-    } catch (err: any) {
-      throw this.notifier.error(err.message);
+    }
+    catch (err: any) {
+      throw this.notifier.error(err.message)
     }
   }
+
   async authVerifyToken(): Promise<void> {
     try {
       await this.client.getAuthVerifyToken()
@@ -102,6 +98,48 @@ export default class AuthService {
   async authGoogle(): Promise<void> {
     try {
       await this.client.getAuthGetAutorizationUrl()
+    }
+    catch (err: any) {
+      throw this.notifier.error(err.message)
+    }
+  }
+
+  async googleCallback(): Promise<void> {
+    try {
+      await this.client.googleCallback()
+    }
+    catch (err: any) {
+      throw this.notifier.error(err.message)
+    }
+  }
+
+  async googleSuccess(): Promise<void> {
+    console.log('service googleSuccess')
+    this.loginStore.setLoading(true)
+    try {
+      const { refreshToken, accessToken, userData, userAbilities } = await this.client.googleSuccess()
+
+      this.ability.update(userAbilities as any)
+      this.authUser.setUser(userData)
+      this.authUser.setDadosTemporario(refreshToken, accessToken, userAbilities)
+      this.authUser.setToken(accessToken)
+      this.authUser.setRefreshToken(refreshToken)
+      this.authUser.setAbilities(userAbilities)
+      this.authUser.setIsAuth(true)
+      this.loginStore.resetFormLogin()
+      this.notifier.success('Login realizado com sucesso!')
+    }
+    catch (err: any) {
+      throw this.notifier.error(err.message)
+    }
+    finally {
+      this.loginStore.setLoading(false)
+    }
+  }
+
+  async authLogout(): Promise<void> {
+    try {
+
     }
     catch (err: any) {
       throw this.notifier.error(err.message)

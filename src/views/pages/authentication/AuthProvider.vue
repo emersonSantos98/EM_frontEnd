@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import svgGoogle from '@/assets/images/iconify-svg/fa-google.svg'
+import Notifier from '@core/utils/Notifier'
+
+const notifier = new Notifier()
 
 const authProviders = [
   {
     icon: svgGoogle,
     color: 'secondary',
-    title: ' Google',
+    title: 'Google',
   },
 ]
 
@@ -16,18 +18,12 @@ function handleAuthProviderClick(link) {
 }
 
 async function handleGoogleLogin() {
-  const googleAuth = VueGoogleOAuth2.init({
-    clientId: '247306928090-nmeselbim1jgm3tg98aa0v7g22s63osb.apps.googleusercontent.com',
-    scope: 'email',
-    prompt: 'consent',
-  })
-
-  googleAuth.signIn().then(googleUser => {
-    // Autenticação bem-sucedida. Acesse o token de acesso e outras informações do usuário aqui.
-    const idToken = googleUser.getAuthResponse().id_token
-
-    console.log('idToken', idToken)
-  })
+  try {
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`
+  }
+  catch (err: any) {
+    throw notifier.error('Erro ao tentar autenticar com Google')
+  }
 }
 </script>
 
@@ -41,15 +37,25 @@ async function handleGoogleLogin() {
       :color="link.color"
       @click="handleAuthProviderClick(link)"
     >
-      <img :src="link.icon" alt="icon" width="27" height="27" />
-      <span class="text-black" style="text-transform: capitalize;">{{ link.title }}</span>
+      <img
+        :src="link.icon"
+        alt="icon"
+        width="27"
+        height="27"
+      >
+      <span
+        class="text-black"
+        style="text-transform: capitalize;"
+      >
+        {{ link.title }}
+      </span>
     </VBtn>
   </div>
 </template>
 
 <style scoped>
 .text-black {
-  color: rgb(0, 0, 0, 0.67) !important;
-  font-size: .875rem;
+  color: rgba(0, 0, 0, 0.67) !important;
+  font-size: 0.875rem;
 }
 </style>
