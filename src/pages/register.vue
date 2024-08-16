@@ -3,14 +3,12 @@ import Access from '@/views/register/components/Access/Index.vue'
 import Identification from '@/views/register/components/Identification/Index.vue'
 import Subscription from '@/views/register/components/Subscription/Index.vue'
 import AppStepper from '@/views/register/components/AppStepper.vue'
-import SetpLayout from "@/views/register/components/SetpLayout.vue";
-import RegisterService from "@/views/register/register.service";
-import {useRoute} from "vue-router";
-const route = useRoute()
+import SetpLayout from '@/views/register/components/SetpLayout.vue'
+import RegisterService from '@/views/register/register.service'
+
 const registerService = new RegisterService()
 
 const currentStep = ref(0)
-
 </script>
 
 <template>
@@ -26,7 +24,7 @@ const currentStep = ref(0)
         />
       </VCardText>
 
-      <VDivider/>
+      <VDivider />
 
       <VCardText>
         <!-- 👉 stepper content -->
@@ -35,31 +33,30 @@ const currentStep = ref(0)
           class="disable-tab-transition"
         >
           <VWindowItem>
-            <setp-layout>
+            <SetpLayout>
               <Identification
                 v-model:current-step="currentStep"
                 v-model:register-data="registerService.store.formIdentification"
               />
-            </setp-layout>
-
+            </SetpLayout>
           </VWindowItem>
 
           <VWindowItem>
-            <setp-layout>
+            <SetpLayout>
               <Access
                 v-model:current-step="currentStep"
                 v-model:register-data="registerService.store.formAccess"
               />
-            </setp-layout>
+            </SetpLayout>
           </VWindowItem>
 
           <VWindowItem>
-            <setp-layout>
+            <SetpLayout>
               <Subscription
                 v-model:current-step="currentStep"
                 v-model:register-data="registerService.store.formSubscription"
               />
-            </setp-layout>
+            </SetpLayout>
           </VWindowItem>
         </VWindow>
       </VCardText>

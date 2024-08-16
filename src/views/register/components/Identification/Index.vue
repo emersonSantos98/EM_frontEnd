@@ -39,7 +39,6 @@ async function handleSubmit() {
 }
 
 function googleAuth() {
-  window.open('http://localhost:3030/api/v1/auth/google/callback', '_blank')
 }
 </script>
 

@@ -72,5 +72,9 @@ export interface IAuthClient {
   getAuthVerifyToken: () => Promise<string>
   postAuthRefreshToken: () => Promise<IPostAuthRefresToeknResponse>
   getAuthGetAutorizationUrl: () => Promise<string>
+  googleSuccess: () => Promise<IPostAuthLoginResponse>
+  googleCallback: () => Promise<void>
+  googleAuth: () => Promise<void>
+  postAuthLogout: () => Promise<void>
 }
 
