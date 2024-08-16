@@ -14,9 +14,9 @@ onMounted(async () => {
   try {
     // Faz a requisição para verificar o sucesso do login
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/success`, {
-      withCredentials: true,
+      credentials: 'include',
     })
-    console.log('response', response)
+
     const result = await response.json()
 
     if (result && !result.error) {
