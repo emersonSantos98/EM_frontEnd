@@ -9,6 +9,7 @@ import Notifier from '@core/utils/Notifier'
 const notifier = new Notifier()
 const ability = useAppAbility()
 const authUser = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 
 onMounted(async () => {
@@ -26,7 +27,9 @@ onMounted(async () => {
       authUser.setAbilities(user.userAbilities)
       authUser.setIsAuth(true)
       notifier.success('Login realizado com sucesso!')
-      router.push({ name: 'index' })
+      await nextTick(() => {
+        router.replace(route.query.to ? String(route.query.to) : '/')
+      })
     }
     else {
       throw new Error('Erro ao processar o login com Google')
