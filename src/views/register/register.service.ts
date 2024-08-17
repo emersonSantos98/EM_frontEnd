@@ -18,12 +18,10 @@ export default class RegisterService {
 
   async authRegister(formRegister: IFormRegisterDTO = this.store.getFormRegister)  {
     try {
-      const {user, organization, customer} = await this.client.postUserCreate(formRegister)
+      const {user, } = await this.client.postUserCreate(formRegister)
       this.notifier.success('Conta criada com sucesso!')
       return {
         user,
-        organization,
-        customer
       }
     } catch (err: any) {
       console.log(err)

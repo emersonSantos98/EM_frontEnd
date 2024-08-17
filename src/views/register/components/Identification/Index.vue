@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { IFormIdentificationDTO } from '@/modules/account/list/register/models/types'
+import type { IFormIdentificationDTO } from '@/modules/account/register/types'
 import { min, requiredValidator } from '@validators'
 import svgGoogle from '@/assets/images/iconify-svg/fa-google.svg'
 import Notifier from '@core/utils/Notifier'
@@ -99,22 +99,7 @@ function googleAuth() {
               :rules="[requiredValidator(registerIdetificationDataLocal.cellphone, $t('cell_phone'))]"
             />
           </VCol>
-          <VCol cols="12">
-            <AppTextField
-              v-model="registerIdetificationDataLocal.document"
-              v-mask="['###.###.###-##', '##.###.###/####-##']"
-              :label="$t('document')"
-              :rules="[requiredValidator(registerIdetificationDataLocal.document, $t('document'))]"
-            />
-          </VCol>
-          <VCol cols="12">
-            <AppTextField
-              v-model="registerIdetificationDataLocal.birth_date"
-              v-mask="['##/##/####']"
-              :label="$t('birth_date')"
-              :rules="[requiredValidator(registerIdetificationDataLocal.birth_date, $t('birth_date'))]"
-            />
-          </VCol>
+
           <VCol
             cols="12"
             class="d-flex justify-space-between"

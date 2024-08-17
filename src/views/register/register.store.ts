@@ -1,15 +1,14 @@
-import type {IFormAccessDTO, IFormIdentificationDTO,} from '@/modules/account/list/register/models/types'
-import {IFormSubscriptionDTO, IRegisterSteps} from "@/modules/account/list/register/models/types";
-import i18n from "@/plugins/i18n";
+import type { IFormAccessDTO, IFormIdentificationDTO, IFormSubscriptionDTO, IRegisterSteps, IFormRegisterDTO } from '@/modules/account/register/types'
+
+import i18n from '@/plugins/i18n'
+
 const $t = i18n.global.t
 export const useRegisterStore = defineStore('useRegisterStore', () => {
   const formIdentification = reactive<IFormIdentificationDTO>({
     first_name: '',
     last_name: '',
-    user_type: 'cliente',
+    user_type: 'user',
     cellphone: '',
-    document: '',
-    birth_date: '',
   })
 
   const formAccess = reactive<IFormAccessDTO>({
