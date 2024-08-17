@@ -3,7 +3,9 @@ import { ref, watch } from 'vue'
 import type { IFormIdentificationDTO } from '@/modules/account/list/register/models/types'
 import { min, requiredValidator } from '@validators'
 import svgGoogle from '@/assets/images/iconify-svg/fa-google.svg'
+import Notifier from '@core/utils/Notifier'
 
+const notifier = new Notifier()
 interface Props {
   currentStep?: number
   registerData: IFormIdentificationDTO
@@ -39,6 +41,12 @@ async function handleSubmit() {
 }
 
 function googleAuth() {
+  try {
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google/callback`
+  }
+  catch (err: any) {
+    throw notifier.error('Erro ao tentar autenticar com Google')
+  }
 }
 </script>
 
@@ -119,14 +127,7 @@ function googleAuth() {
               {{ $t('back login') }}
             </VBtn>
             <VBtn
-              type="submit"
-              @click="handleSubmit"
-            >
-              {{ $t('continue') }}
-            </VBtn>
-            <VBtn
               variant="outlined"
-              size="x-large"
               color="secondary"
               @click="googleAuth"
             >
@@ -140,6 +141,12 @@ function googleAuth() {
                 class="text-black"
                 style="text-transform: capitalize;"
               >Google</span>
+            </VBtn>
+            <VBtn
+              type="submit"
+              @click="handleSubmit"
+            >
+              {{ $t('continue') }}
             </VBtn>
           </VCol>
         </VRow>
