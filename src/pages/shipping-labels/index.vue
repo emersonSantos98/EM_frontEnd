@@ -3,6 +3,7 @@ import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
 import { ref } from 'vue'
 import { useLabelOrganizerStore } from '@/views/apps/shipping-labels/labelOrganizerStore'
 import Viewfille from '@/views/apps/shipping-labels/viewfille.vue'
+import ContentDeclaration from "@/views/apps/shipping-labels/contentDeclaration.vue";
 
 const store = useLabelOrganizerStore()
 const dropZoneRef = ref<HTMLDivElement>()
@@ -163,6 +164,9 @@ async function generateShippingLabel() {
     <VCol cols="12" md="6">
       <Viewfille />
     </VCol>
+<!--    <VCol cols="12" md="6">-->
+<!--      <contentDeclaration />-->
+<!--    </VCol>-->
   </VRow>
 </template>
 
