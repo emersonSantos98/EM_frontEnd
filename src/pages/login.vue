@@ -24,11 +24,12 @@ const authThemeImg = useGenerateImageVariant(
   true,
 )
 
+const route = useRoute()
+const router = useRouter()
+
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
 const isPasswordVisible = ref(false)
-
-const router = useRouter()
 
 const authService = new AuthService()
 
@@ -42,9 +43,12 @@ const errors = ref<Record<string, string | undefined>>({
 async function login() {
   await authService.authLogin()
 
-  await router.push({ name: 'index' })
+  // await router.push({ name: 'index' })
+  await nextTick(() => {
+    router.replace(route.query.to ? String(route.query.to) : '/')
+  })
 }
-
+// shipping-labels
 function onSubmit() {
   refVForm.value?.validate().then(({ valid: isValid }) => {
     if (isValid)

@@ -17,7 +17,7 @@ const router = createRouter({
         if (userRole === 'admin')
           return { name: 'index' }
         if (userRole === 'user')
-          return { name: 'index' }
+          return { name: 'shipping-labels' }
 
         return { name: 'login', query: to.query }
       },
