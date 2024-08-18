@@ -88,11 +88,15 @@ watch(fileData, newFileData => {
     store.generatedLabelUrl = null
   }
 })
+
+function printPDF() {
+  window.open(store.generatedLabelUrl, '_blank')
+}
 </script>
 
 <template>
   <VRow class="align-center justify-center">
-    <VCol cols="12" md="5">
+    <VCol cols="12" :md="store.generatedLabelUrl ? 5 : 12">
       <VCard class="mb-6">
         <VCardTitle>
           Upload de Etiqueta de Envio
@@ -216,8 +220,18 @@ watch(fileData, newFileData => {
       </VCard>
     </VCol>
 
-    <!-- Coluna para o ícone -->
-    <VCol cols="12" md="2" class="d-flex justify-center align-center">
+    <VCol cols="12" md="2" class="d-flex flex-column justify-center align-center" v-if="store.generatedLabelUrl" >
+      <VBtn
+        class="mb-4"
+        color="success"
+        @click="printPDF"
+      >
+        Imprimir
+        <VIcon
+          end
+          icon="tabler-printer"
+        />
+      </VBtn>
       <lord-icon
         src="https://cdn.lordicon.com/axacjdbs.json"
         trigger="hover"
