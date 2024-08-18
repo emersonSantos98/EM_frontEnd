@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import { useLabelOrganizerStore } from '@/views/apps/shipping-labels/labelOrganizerStore'
 const store = useLabelOrganizerStore()
 const generatedLabelUrl = computed(() => store.generatedLabelUrl)
+
+
 </script>
 
 <template>
@@ -10,6 +12,7 @@ const generatedLabelUrl = computed(() => store.generatedLabelUrl)
     <VCardTitle>
       Etiqueta de Envio Gerada
     </VCardTitle>
+
     <VCardText>
       <div class="flex justify-center">
         <iframe :src="generatedLabelUrl" width="100%" height="600px"></iframe>
@@ -19,5 +22,13 @@ const generatedLabelUrl = computed(() => store.generatedLabelUrl)
 </template>
 
 <style scoped lang="scss">
+.economia-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
+.strong {
+  font-weight: bold;
+}
 </style>

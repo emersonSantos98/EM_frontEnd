@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useLabelOrganizerStore } from '@/views/apps/shipping-labels/labelOrganizerStore'
 import Viewfille from '@/views/apps/shipping-labels/viewfille.vue'
-import ContentDeclaration from "@/views/apps/shipping-labels/contentDeclaration.vue";
+import Notifier from '@core/utils/Notifier'
 
+const notifier = new Notifier()
 const store = useLabelOrganizerStore()
 const dropZoneRef = ref<HTMLDivElement>()
 
@@ -16,11 +17,21 @@ interface FileData {
 const fileData = ref<FileData[]>([])
 const { open, onChange } = useFileDialog({ accept: 'application/pdf' })
 
+function pluralize(count, singular, plural) {
+  return count === 1 ? singular : plural
+}
+
+async function processFile(file: File) {
+  const countPage = await store.countPages(file)
+
+  store.countPages = countPage
+}
+
 function onDrop(DroppedFiles: File[] | null) {
   if (DroppedFiles) {
     const file = DroppedFiles[0]
     if (file.type !== 'application/pdf') {
-      alert('Only PDF files are allowed')
+      notifier.error('Somente arquivos PDF são permitidos')
 
       return
     }
@@ -28,14 +39,15 @@ function onDrop(DroppedFiles: File[] | null) {
       file,
       url: useObjectUrl(file).value ?? '',
     }]
+    processFile(file)
   }
 }
 
-onChange(selectedFiles => {
+onChange(async selectedFiles => {
   if (selectedFiles) {
     const file = selectedFiles[0]
     if (file.type !== 'application/pdf') {
-      alert('Only PDF files are allowed')
+      notifier.error('Somente arquivos PDF são permitidos')
 
       return
     }
@@ -43,14 +55,22 @@ onChange(selectedFiles => {
       file,
       url: useObjectUrl(file).value ?? '',
     }]
+    processFile(file)
   }
 })
 
 useDropZone(dropZoneRef, onDrop)
 
+function removeFile(index: number) {
+  fileData.value.splice(index, 1)
+  store.countPages = 0
+  store.countpagesEconomic = 0
+  store.generatedLabelUrl = null
+}
+
 async function generateShippingLabel() {
   if (fileData.value.length === 0) {
-    alert('Please upload a PDF file')
+    notifier.error('Nenhum arquivo selecionado')
 
     return
   }
@@ -60,15 +80,58 @@ async function generateShippingLabel() {
   formData.append('file', fileData.value[0].file)
   await store.generateShippingLabels(formData)
 }
+
+watch(fileData, newFileData => {
+  if (newFileData.length === 0) {
+    store.countPages = 0
+    store.countpagesEconomic = 0
+    store.generatedLabelUrl = null
+  }
+})
 </script>
 
 <template>
-  <VRow>
-    <VCol cols="12" md="6">
+  <VRow class="align-center justify-center">
+    <VCol cols="12" md="5">
       <VCard class="mb-6">
         <VCardTitle>
-          Upload Etiqueta de envio
+          Upload de Etiqueta de Envio
         </VCardTitle>
+        <VCardText>
+          <VCol cols="12" md="12">
+            <VAlert
+              v-if="store.countPages > 0"
+              type="warning"
+              variant="tonal"
+              dismissible
+            >
+              Total de
+              {{ pluralize(store.countPages, 'Etiqueta e declaração de conteúdo importada:', 'Etiquetas e declarações de conteúdo importadas:') }}
+              <span>{{ store.countPages }} {{ pluralize(store.countPages, 'página', 'páginas') }}</span>
+            </VAlert>
+          </VCol>
+          <VCol cols="12" md="12">
+            <VAlert
+              v-if="store.countpagesEconomic > 0"
+              type="success"
+              variant="tonal"
+              dismissible
+            >
+              <div class="economia-container">
+                <div>
+                  {{ pluralize(store.countpagesEconomic, 'Etiqueta e declaração de conteúdo otimizada:', 'Etiquetas e declarações de conteúdo otimizadas:') }}
+                  <strong>{{ store.countpagesEconomic }}</strong>
+                  {{ pluralize(store.countpagesEconomic, 'página', 'páginas') }}
+                </div>
+                <div>
+                  Você economizou:
+                  <strong>{{ store.countPages - store.countpagesEconomic }}</strong>
+                  {{ pluralize(store.countPages - store.countpagesEconomic, 'página', 'páginas') }}
+                </div>
+              </div>
+            </VAlert>
+          </VCol>
+        </VCardText>
         <VCardText>
           <div class="flex">
             <div class="w-full h-auto relative">
@@ -100,18 +163,9 @@ async function generateShippingLabel() {
                   class="d-flex justify-center align-center gap-3 pa-8 border-dashed drop-zone flex-wrap"
                 >
                   <VRow class="match-height w-100">
-                    <template
-                      v-for="(item, index) in fileData"
-                      :key="index"
-                    >
-                      <VCol
-                        cols="12"
-                        sm="12"
-                      >
-                        <VCard
-                          :ripple="false"
-                          border
-                        >
+                    <template v-for="(item, index) in fileData" :key="index">
+                      <VCol cols="12" sm="12">
+                        <VCard :ripple="false" border>
                           <VCardText
                             class="d-flex flex-column"
                             @click.stop
@@ -137,7 +191,7 @@ async function generateShippingLabel() {
                             <VBtn
                               variant="outlined"
                               block
-                              @click.stop="fileData.splice(index, 1)"
+                              @click.stop="removeFile(index)"
                             >
                               Remover Arquivo
                             </VBtn>
@@ -161,12 +215,20 @@ async function generateShippingLabel() {
         </VCardText>
       </VCard>
     </VCol>
-    <VCol cols="12" md="6">
+
+    <!-- Coluna para o ícone -->
+    <VCol cols="12" md="2" class="d-flex justify-center align-center">
+      <lord-icon
+        src="https://cdn.lordicon.com/axacjdbs.json"
+        trigger="hover"
+        colors="primary:#65d2d7,secondary:#f69666"
+        style="width:100px;height:100px">
+      </lord-icon>
+    </VCol>
+
+    <VCol cols="12" md="5">
       <Viewfille />
     </VCol>
-<!--    <VCol cols="12" md="6">-->
-<!--      <contentDeclaration />-->
-<!--    </VCol>-->
   </VRow>
 </template>
 
@@ -183,50 +245,6 @@ async function generateShippingLabel() {
 }
 </style>
 
-<style lang="scss">
-.inventory-card{
-  .v-radio-group,
-  .v-checkbox {
-    .v-selection-control {
-      align-items: start !important;
-
-      .v-selection-control__wrapper{
-        margin-block-start: -0.375rem !important;
-      }
-    }
-
-    .v-label.custom-input {
-      border: none !important;
-    }
-  }
-
-  .v-tabs.v-tabs-pill {
-    .v-slide-group-item--active.v-tab--selected.text-primary {
-      h6{
-        color: #fff !important
-      }
-    }
-  }
-
-}
-
-.ProseMirror{
-  p{
-    margin-block-end: 0;
-  }
-
-  padding: 0.5rem;
-  outline: none;
-
-  p.is-editor-empty:first-child::before {
-    block-size: 0;
-    color: #adb5bd;
-    content: attr(data-placeholder);
-    float: inline-start;
-    pointer-events: none;
-  }
-}
-</style>
 
 <route lang="yaml">
 meta:
