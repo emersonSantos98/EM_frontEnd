@@ -165,7 +165,7 @@ async function deletePartner(id: string) {
 
       <!-- Ações -->
       <template #item.actions="{ item }">
-        <IconBtn>
+        <IconBtn @click="$router.push(`/apps/workshop/externalservices/edit/${item.raw.id}`)">
           <VIcon icon="tabler-edit" />
         </IconBtn>
         <IconBtn @click="deletePartner(item.raw.id)">
