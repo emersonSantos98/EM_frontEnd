@@ -29,7 +29,7 @@ export default class WorkshopClient {
 
   async update(id: string, data: PartnerType) {
     try {
-      return await axios.put(`colaboradores/${id}`, data)
+      return await axios.put(`colaboradores/update/${id}`, data)
     }
     catch (err: any) {
       throw this.error.message(err, 'Não conseguimos atualizar o colaborador.')

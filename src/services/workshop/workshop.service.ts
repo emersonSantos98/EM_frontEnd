@@ -38,8 +38,7 @@ export default class WorkshopService {
     try {
       const res = await this.client.findOne(id)
 
-      this.store.findOne = res
-
+      this.store.findOne = res.data.data
     }
     catch (err: any) {
       throw this.notifier.error(err.message)
@@ -70,9 +69,9 @@ export default class WorkshopService {
     try {
       await this.client.update(id, partner)
 
-      const index = this.store.partners.findIndex(p => p.id === partner.id)
-
-      this.store.partners[index] = partner
+      const index = this.store.partners.rows.findIndex(p => p.id === partner)
+      if (index !== -1)
+        this.store.partners.rows[index] = { ...this.store.partners.rows[index], ...partner }
 
       this.notifier.success('Parceiro atualizado com sucesso!')
     }
