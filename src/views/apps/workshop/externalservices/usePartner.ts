@@ -27,7 +27,7 @@ export const usePartnerStore = defineStore('partner', {
     async fetchPartners(query: IQueryPartner) {
       this.loadingPartners = true
       try {
-         await new WorkshopService().findAllPartner(query)
+        await new WorkshopService().findAllPartner(query)
       }
       catch (error) {
         console.error('Erro ao buscar parceiros:', error)
@@ -41,9 +41,7 @@ export const usePartnerStore = defineStore('partner', {
     // Buscar um parceiro pelo ID
     async fetchOnePartner(id: string) {
       try {
-        const response = await new WorkshopService().findOnePartner(id)
-
-        this.findOne = response.data
+        await new WorkshopService().findOnePartner(id)
       }
       catch (error) {
         console.error('Erro ao buscar parceiro:', error)
