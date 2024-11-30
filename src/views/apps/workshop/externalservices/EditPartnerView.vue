@@ -82,72 +82,82 @@ async function savePartnerChanges() {
 </script>
 
 <template>
-  <VCard class="mb-6" title="Editar Parceiro">
-    <VCardText>
-      <VForm ref="formRef">
-        <VRow>
-          <VCol cols="4" md="6">
-            <VTextField
-              v-model="localPartner.name"
-              label="Nome"
-              placeholder="Digite o nome"
-              :rules="[requiredRule, maxLengthRule(100)]"
-              required
-            />
-          </VCol>
-          <VCol cols="4" md="6">
-            <VTextField
-              v-model="localPartner.whatsapp"
-              label="WhatsApp"
-              placeholder="(11) 93750-7856"
-              :rules="[maxLengthRule(15)]"
-              @input="localPartner.whatsapp = formatWhatsApp(localPartner.whatsapp)"
-            />
-          </VCol>
-          <VCol cols="4" md="6">
-            <VTextField v-model="localPartner.recebedor" label="Pix" placeholder="Pix do recebedor" />
-          </VCol>
-          <VCol cols="12" md="4">
-            <VSelect v-model="localPartner.status" :items="['ativo', 'inativo']" label="Status" />
-          </VCol>
-          <VCol cols="12" md="4">
-            <VTextField
-              v-model="localPartner.cep"
-              label="CEP"
-              placeholder="12345-678"
-              :rules="[maxLengthRule(9)]"
-              @input="localPartner.cep = formatCep(localPartner.cep)"
-            />
-          </VCol>
-          <VCol cols="12" md="4">
-            <VTextField
-              v-model="localPartner.estado"
-              label="Estado"
-              placeholder="Ex.: SP"
-              maxlength="2"
-              :rules="[requiredRule, stateRule]"
-            />
-          </VCol>
-          <VCol cols="12" md="6">
-            <VTextField v-model="localPartner.logradouro" label="Endereço" placeholder="Rua, Avenida..." />
-          </VCol>
-          <VCol cols="12" md="3">
-            <VTextField v-model="localPartner.numero" label="Número" placeholder="Número" />
-          </VCol>
-          <VCol cols="12" md="3">
-            <VTextField v-model="localPartner.complemento" label="Complemento" placeholder="Ex.: Apt 101" />
-          </VCol>
-          <VCol cols="12" md="6">
-            <VTextField v-model="localPartner.bairro" label="Bairro" placeholder="Bairro" />
-          </VCol>
-          <VCol cols="12" md="6">
-            <VTextField v-model="localPartner.cidade" label="Cidade" placeholder="Cidade" />
-          </VCol>
-          <VCol cols="12" md="6">
-            <VSelect v-model="localPartner.tipo" :items="['oficina', 'costureira']" label="Tipo" :rules="[requiredRule]" required />
-          </VCol>
-        </VRow>
-      </VForm>
-    </VCardText>
-  </VCard>
+  <div>
+    <VCard class="mb-6" title="Editar Parceiro">
+      <VCardText>
+        <VForm ref="formRef">
+          <VRow>
+            <VCol cols="4" md="6">
+              <VTextField
+                v-model="localPartner.name"
+                label="Nome"
+                placeholder="Digite o nome"
+                :rules="[requiredRule, maxLengthRule(100)]"
+                required
+              />
+            </VCol>
+            <VCol cols="4" md="6">
+              <VTextField
+                v-model="localPartner.whatsapp"
+                label="WhatsApp"
+                placeholder="(11) 93750-7856"
+                :rules="[maxLengthRule(15)]"
+                @input="localPartner.whatsapp = formatWhatsApp(localPartner.whatsapp)"
+              />
+            </VCol>
+            <VCol cols="4" md="6">
+              <VTextField v-model="localPartner.recebedor" label="Pix" placeholder="Pix do recebedor" />
+            </VCol>
+            <VCol cols="12" md="4">
+              <VSelect v-model="localPartner.status" :items="['ativo', 'inativo']" label="Status" />
+            </VCol>
+            <VCol cols="12" md="4">
+              <VTextField
+                v-model="localPartner.cep"
+                label="CEP"
+                placeholder="12345-678"
+                :rules="[maxLengthRule(9)]"
+                @input="localPartner.cep = formatCep(localPartner.cep)"
+              />
+            </VCol>
+            <VCol cols="12" md="4">
+              <VTextField
+                v-model="localPartner.estado"
+                label="Estado"
+                placeholder="Ex.: SP"
+                maxlength="2"
+                :rules="[requiredRule, stateRule]"
+              />
+            </VCol>
+            <VCol cols="12" md="6">
+              <VTextField v-model="localPartner.logradouro" label="Endereço" placeholder="Rua, Avenida..." />
+            </VCol>
+            <VCol cols="12" md="3">
+              <VTextField v-model="localPartner.numero" label="Número" placeholder="Número" />
+            </VCol>
+            <VCol cols="12" md="3">
+              <VTextField v-model="localPartner.complemento" label="Complemento" placeholder="Ex.: Apt 101" />
+            </VCol>
+            <VCol cols="12" md="6">
+              <VTextField v-model="localPartner.bairro" label="Bairro" placeholder="Bairro" />
+            </VCol>
+            <VCol cols="12" md="6">
+              <VTextField v-model="localPartner.cidade" label="Cidade" placeholder="Cidade" />
+            </VCol>
+            <VCol cols="12" md="6">
+              <VSelect v-model="localPartner.tipo" :items="['oficina', 'costureira']" label="Tipo" :rules="[requiredRule]" required />
+            </VCol>
+          </VRow>
+
+        </VForm>
+      </VCardText>
+    </VCard>
+    <VRow class="mt-4">
+      <VCol>
+        <VBtn color="success" @click="savePartnerChanges">
+          Salvar Alterações
+        </VBtn>
+      </VCol>
+    </VRow>
+  </div>
 </template>

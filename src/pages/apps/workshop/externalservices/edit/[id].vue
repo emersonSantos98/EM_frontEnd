@@ -46,7 +46,7 @@ async function savePartnerChanges() {
     if (partner.value) {
       await partnerStore.updatePartner(partner.value.id, partner.value)
       console.log('Parceiro atualizado com sucesso:', partner.value)
-      router.push('/apps/workshop/externalservices') // Redireciona para a lista
+      router.push('/apps/workshop/externalservices/list') // Redireciona para a lista
     }
   }
   else {
@@ -67,17 +67,18 @@ onMounted(fetchPartner)
         </h4>
         <span>Altere as informações do parceiro externo</span>
       </div>
-      <div class="d-flex gap-4 align-center flex-wrap">
-        <VBtn
-          variant="tonal"
-          color="primary"
-          @click="savePartnerChanges"
-        >
-          Salvar Alterações
-        </VBtn>
-      </div>
+    </div>
+    <div class="d-flex gap-4 align-center">
+      <VBtn
+        color="warning"
+        @click="$router.push('/apps/workshop/externalservices/list')"
+      >
+        <VIcon icon="tabler-arrow-big-left-lines" />
+        Voltar
+      </VBtn>
     </div>
     <EditPartnerView
+      class="mt-4"
       v-if="partner"
       :partner="partner"
     />

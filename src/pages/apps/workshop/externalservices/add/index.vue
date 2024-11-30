@@ -43,24 +43,63 @@ async function savePartner() {
 
 <template>
   <div>
-    <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
+    <div class="d-flex flex-wrap justify-between align-center gap-4 mb-6">
+      <!-- Botões Voltar e Salvar -->
       <div class="d-flex flex-column justify-center">
         <h4 class="text-h4 font-weight-medium">
           Adicionar Parceiro Externo
         </h4>
         <span> Preencha as informações do parceiro externo</span>
       </div>
-
-      <div class="d-flex gap-4 align-center flex-wrap">
-        <VBtn
-          variant="tonal"
-          color="primary"
-          @click="savePartner"
-        >
-          Salvar Parceiro
-        </VBtn>
-      </div>
     </div>
-    <AddPartnerView :partner="partner" />
+    <div class="d-flex gap-4 align-center">
+      <VBtn
+        color="warning"
+        @click="$router.push('/apps/workshop/externalservices/list')"
+      >
+        <VIcon icon="tabler-arrow-big-left-lines" />
+        Voltar
+      </VBtn>
+    </div>
+    <AddPartnerView class="mt-4" :partner="partner" />
+    <VBtn
+      color="success"
+      @click="savePartner"
+    >
+      Salvar Parceiro
+    </VBtn>
   </div>
 </template>
+
+
+<!--<template>-->
+<!--  <div>-->
+<!--    <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">-->
+<!--      <div class="d-flex flex-column justify-center">-->
+<!--        <h4 class="text-h4 font-weight-medium">-->
+<!--          Adicionar Parceiro Externo-->
+<!--        </h4>-->
+<!--        <span> Preencha as informações do parceiro externo</span>-->
+<!--      </div>-->
+<!--      <div class="d-flex gap-4 align-start flex-wrap">-->
+<!--        <VBtn-->
+<!--          variant="tonal"-->
+<!--          color="primary"-->
+<!--          @click="$router.push('/apps/workshop/externalservices/list')"-->
+<!--        >-->
+<!--           <VIcon icon="tabler-arrow-big-left-lines" />-->
+<!--        </VBtn>-->
+<!--      </div>-->
+<!--      <div class="d-flex gap-4 align-center flex-wrap">-->
+<!--        <VBtn-->
+<!--          variant="tonal"-->
+<!--          color="success"-->
+<!--          @click="savePartner"-->
+<!--        >-->
+<!--          Salvar Parceiro-->
+<!--        </VBtn>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <AddPartnerView :partner="partner" />-->
+<!--  </div>-->
+<!--</template>-->
