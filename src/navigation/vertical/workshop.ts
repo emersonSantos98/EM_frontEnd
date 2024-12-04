@@ -20,6 +20,23 @@ export default [
           },
         ],
       },
+      {
+        title: 'Produtos',
+        children: [
+          {
+            title: 'List',
+            to: 'apps-workshop-product-list',
+            action: 'manage',
+            subject: 'all',
+          },
+          {
+            title: 'Add',
+            to: 'apps-workshop-product-add',
+            action: 'manage',
+            subject: 'all',
+          },
+        ],
+      },
     ],
 
   },

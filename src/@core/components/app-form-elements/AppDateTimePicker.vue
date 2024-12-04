@@ -73,7 +73,7 @@ if (compAttrs.config && compAttrs.config.inline) {
 }
 
 // v-field clear prop
-const onClear = (el: MouseEvent) => {
+function onClear(el: MouseEvent) {
   el.stopPropagation()
 
   nextTick(() => {
@@ -89,7 +89,7 @@ const vuetifyTheme = useTheme()
 const vuetifyThemesName = Object.keys(vuetifyTheme.themes.value)
 
 // Themes class added to flat-picker component for light and dark support
-const updateThemeClassInCalendar = () => {
+function updateThemeClassInCalendar() {
   // ℹ️ Flatpickr don't render it's instance in mobile and device simulator
   if (!refFlatPicker.value.fp.calendarContainer)
     return
@@ -106,7 +106,7 @@ onMounted(() => {
   updateThemeClassInCalendar()
 })
 
-const emitModelValue = (val: string) => {
+function emitModelValue(val: string) {
   emit('update:modelValue', val)
 }
 
