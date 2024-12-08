@@ -1,5 +1,5 @@
 import axios from '@axios'
-import type { IQueryVariation, ProductType } from '@/views/apps/workshop/product/types'
+import type { IQueryVariation, ProductType, IQueryProduct } from '@/views/apps/workshop/product/types'
 import ErrorMessage from '@/@core/utils/Error'
 
 export default class ProductClient {
@@ -9,7 +9,7 @@ export default class ProductClient {
     this.error = new ErrorMessage()
   }
 
-  async findAll(query: IQueryVariation) {
+  async findAll(query: IQueryProduct) {
     try {
       return await axios.get('produtos', { params: query })
     }

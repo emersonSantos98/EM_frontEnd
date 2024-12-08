@@ -35,6 +35,12 @@ export default [
             action: 'manage',
             subject: 'all',
           },
+          {
+            title: 'Gestão de Estoque',
+            to: 'apps-workshop-product-stock',
+            action: 'manage',
+            subject: 'all',
+          },
         ],
       },
     ],

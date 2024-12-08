@@ -2,8 +2,8 @@ import Notifier from '@core/utils/Notifier'
 
 import ProductClient from '@/api/workshop/product.client'
 import type { IUseProductStore } from '@/views/apps/workshop/product/useProduct'
-import { useProductStore} from '@/views/apps/workshop/product/useProduct'
-import type { ProductType, IQueryVariation } from '@/views/apps/workshop/product/types'
+import { useProductStore } from '@/views/apps/workshop/product/useProduct'
+import type { IQueryProduct, IQueryVariation, ProductType } from '@/views/apps/workshop/product/types'
 
 export default class ProductService {
   public readonly client: ProductClient
@@ -16,10 +16,10 @@ export default class ProductService {
     this.store = useProductStore()
   }
 
-  async findAllProduct() {
+  async findAllProduct(query: IQueryProduct) {
     this.store.loadingProducts = true
     try {
-      const res = await this.client.findAll()
+      const res = await this.client.findAll(query)
 
       this.store.products = res.data.data
 
@@ -86,7 +86,7 @@ export default class ProductService {
     this.store.loadingProducts = true
     try {
       await this.client.delete(id)
-      this.store.products = this.store.products.rows.filter(p => p.id !== id)
+      this.store.products.produtos = this.store.products.produtos.filter(p => p.id !== id)
 
       this.notifier.success('Produto deletado com sucesso!')
     }
@@ -98,4 +98,3 @@ export default class ProductService {
     }
   }
 }
-

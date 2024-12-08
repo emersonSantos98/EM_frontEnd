@@ -53,7 +53,7 @@ async function saveProduct() {
     <div class="d-flex gap-4 align-center">
       <VBtn
         color="warning"
-        @click="$router.push('/apps/workshop/externalservices/list')"
+        @click="$router.push('/apps/workshop/product/list')"
       >
         <VIcon icon="tabler-arrow-big-left-lines" />
         Voltar
