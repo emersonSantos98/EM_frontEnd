@@ -12,17 +12,19 @@ onMounted(() => {
   inventoryStore.fetchMovements()
 })
 
+// Função para limpar a variação (removendo tamanho e caracteres extras)
 function cleanVariation(variation: string): string {
   return variation.split('/')[0].trim() // Remove o tamanho e mantém apenas a cor
 }
 
+// Função para obter o hex a partir do nome da cor
 function getHexFromColorName(colorName: string): string {
   colorName = cleanVariation(colorName)
 
-  // Normalize the input: remove extra spaces, convert to lowercase, and handle accents.
+  // Normalize o input: remove espaços extras, converte para minúsculas e trata acentos.
   const normalizedColor = colorName.trim().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
 
-  // Use a predefined map for base colors to derive RGB dynamically (expandable logic).
+  // Lista expandida de cores
   const baseColors: Record<string, [number, number, number]> = {
     preto: [0, 0, 0],
     branco: [255, 255, 255],
@@ -35,16 +37,23 @@ function getHexFromColorName(colorName: string): string {
     cinza: [128, 128, 128],
     laranja: [255, 165, 0],
     marrom: [139, 69, 19],
+    turquesa: [64, 224, 208],
+    lilas: [200, 162, 200],
+    dourado: [255, 215, 0],
+    prata: [192, 192, 192],
+    vinho: [128, 0, 0],
+    creme: [255, 253, 208],
+    azulmarinho: [0, 0, 128],
   }
 
-  // Check if the normalized color exists in the base map.
+  // Verifica se a cor está no mapa
   if (normalizedColor in baseColors) {
     const [r, g, b] = baseColors[normalizedColor]
 
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
   }
 
-  // Attempt to process compound colors like "verde marsala" or "azul celeste"
+  // Processa cores compostas (e.g., "verde água")
   const words = normalizedColor.split(/\s+/)
   const combinedRGB: [number, number, number] = [0, 0, 0]
   let validColorCount = 0
@@ -61,13 +70,13 @@ function getHexFromColorName(colorName: string): string {
   })
 
   if (validColorCount > 0) {
-    // Average the colors if multiple components are found
+    // Calcula a média das cores encontradas
     const averagedRGB = combinedRGB.map(value => Math.min(Math.round(value / validColorCount), 255))
 
     return `#${((1 << 24) + (averagedRGB[0] << 16) + (averagedRGB[1] << 8) + averagedRGB[2]).toString(16).slice(1)}`
   }
 
-  // Generate a fallback hex value based on the hash of the input string
+  // Gera uma cor fallback com base no hash da string
   const hash = normalizedColor.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
   const r = (hash & 0xFF0000) >> 16
   const g = (hash & 0x00FF00) >> 8
@@ -82,6 +91,7 @@ function getGradientStyle(variation: string) {
 
   return {
     backgroundImage: `linear-gradient(to right, ${color} -27%, white)`,
+    color: color === '#ffffff' ? 'black' : 'white', // Altera o texto caso a cor seja branca
   }
 }
 
@@ -92,59 +102,49 @@ function formatQuantity(type: string, quantity: number): string {
 
 // Função para obter a cor correspondente ao tipo
 function getQuantityColor(type: string): string {
-  return type === 'Entrada' ? 'green' : 'red';
+  return type === 'Entrada' ? '#2dc56c' : 'red';
 }
 </script>
 
 <template>
   <VTable class="text-no-wrap">
     <thead>
-      <tr>
-        <th class="text-uppercase">
-          Produto
-        </th>
-        <th class="text-uppercase">
-          Variação
-        </th>
-        <th class="text-uppercase">
-          Quantidade
-        </th>
-        <th class="text-uppercase">
-          Data
-        </th>
-        <th class="text-uppercase">
-          Tipo
-        </th>
-      </tr>
+    <tr>
+      <th class="text-uppercase">Produto</th>
+      <th class="text-uppercase">Variação</th>
+      <th class="text-uppercase">Quantidade</th>
+      <th class="text-uppercase">Data</th>
+      <th class="text-uppercase">Tipo</th>
+    </tr>
     </thead>
 
     <tbody>
-      <tr
-        v-for="item in inventoryMovements"
-        :key="item.product + item.variation + item.date"
-      >
-        <td>{{ item.product }}</td>
-        <td>
-          <div
-            class="variation-style"
-            :style="getGradientStyle(item.variation)"
-          >
-            {{ item.variation }}
-          </div>
-        </td>
-        <td :style="{ color: getQuantityColor(item.type) }">
-          {{ formatQuantity(item.type, item.quantity) }}
-        </td>
-        <td>{{ item.date }}</td>
-        <td>
-          <VChip
-            :color="item.type === 'Entrada' ? 'success' : 'error'"
-            variant="elevated"
-          >
-            {{ item.type }}
-          </VChip>
-        </td>
-      </tr>
+    <tr
+      v-for="item in inventoryMovements"
+      :key="item.produto + item.variacao + item.dataMovimentacao"
+    >
+      <td>{{ item.produto }}</td>
+      <td>
+        <div
+          class="variation-style"
+          :style="getGradientStyle(item.variacao)"
+        >
+          {{ item.variacao }}
+        </div>
+      </td>
+      <td :style="{ color: getQuantityColor(item.type) }">
+        {{ formatQuantity(item.type, item.quantidade) }}
+      </td>
+      <td>{{ item.dataMovimentacao }}</td>
+      <td>
+        <VChip
+          :color="item.type === 'Entrada' ? 'success' : 'error'"
+          variant="elevated"
+        >
+          {{ item.type }}
+        </VChip>
+      </td>
+    </tr>
     </tbody>
   </VTable>
 </template>
@@ -153,7 +153,7 @@ function getQuantityColor(type: string): string {
 .variation-style {
   padding: 5px 10px;
   border-radius: 5px;
-  color: white;
   font-weight: bold;
+  /* Alteração para fallback de texto visível */
 }
 </style>
