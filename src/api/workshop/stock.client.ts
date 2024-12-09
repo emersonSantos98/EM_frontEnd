@@ -17,6 +17,7 @@ export default class StockClient {
       throw this.error.message(err, 'Não conseguimos listar os estoques')
     }
   }
+
   async findAllVariacoesSemEstoque(query: IQueryStock) {
     try {
       return await axios.get('estoque/variacoes/sem-estoque', { params: query })
@@ -32,6 +33,15 @@ export default class StockClient {
     }
     catch (err: any) {
       throw this.error.message(err, 'Não conseguimos adicionar o estoque')
+    }
+  }
+
+  async findAllMovimentacaoEstoque(query: IQueryStock) {
+    try {
+      return await axios.get('movimentacaoestoque', { params: query })
+    }
+    catch (err: any) {
+      throw this.error.message(err, 'Não conseguimos listar as movimentações de estoque')
     }
   }
 }

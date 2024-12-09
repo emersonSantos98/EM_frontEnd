@@ -1,6 +1,7 @@
 // stores/stockStore.ts
 import { defineStore } from 'pinia'
-import type { IQueryStock, ProductType } from '../stock/types'
+import type { IQueryStock } from '../stock/types'
+import type { ProductType } from '../product/types'
 import StockService from '@/services/workshop/stock.service'
 
 export const useStockStore = defineStore('stockStore', {
