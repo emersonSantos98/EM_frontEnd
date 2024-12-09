@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import MovementsStockService from '@/services/workshop/movementsStock.service'
 
 interface StockMovement {
   product: string
@@ -11,15 +12,16 @@ interface StockMovement {
 export const useInventoryStore = defineStore('inventory', {
   state: () => ({
     movements: [] as StockMovement[],
+    loadingMovements: false,
   }),
   actions: {
-    fetchMovements() {
-      this.movements = [
-        { product: 'Camisa', variation: 'Preto/M', quantity: 20, date: '2024-12-01', type: 'Entrada' },
-        { product: 'Camisa', variation: 'Preto/G', quantity: 10, date: '2024-12-02', type: 'Saída' },
-        { product: 'Camisa', variation: 'Vermelho/M', quantity: 15, date: '2024-12-03', type: 'Entrada' },
-        { product: 'Camisa', variation: 'Vermelho/G', quantity: 5, date: '2024-12-04', type: 'Saída' },
-      ]
+    async fetchMovements() {
+      await new MovementsStockService().findAllVariacoesSemEstoque({})
     },
   },
 })
+
+export interface IUseInventoryStore {
+  movements: StockMovement[]
+  fetchMovements: () => void
+}
