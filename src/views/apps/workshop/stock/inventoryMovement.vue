@@ -96,13 +96,13 @@ function getGradientStyle(variation: string) {
 }
 
 // Função para formatar a quantidade com sinal
-function formatQuantity(type: string, quantity: number): string {
-  return `${type === 'Entrada' ? '+' : '-'}${quantity}`;
+function formatQuantity(tipo: string, quantity: number): string {
+  return `${tipo === 'Entrada' ? '+' : '-'}${quantity}`;
 }
 
 // Função para obter a cor correspondente ao tipo
-function getQuantityColor(type: string): string {
-  return type === 'Entrada' ? '#2dc56c' : 'red';
+function getQuantityColor(tipo: string): string {
+  return tipo === 'Entrada' ? '#2dc56c' : 'red';
 }
 </script>
 
@@ -132,16 +132,16 @@ function getQuantityColor(type: string): string {
           {{ item.variacao }}
         </div>
       </td>
-      <td :style="{ color: getQuantityColor(item.type) }">
-        {{ formatQuantity(item.type, item.quantidade) }}
+      <td :style="{ color: getQuantityColor(item.tipo) }">
+        {{ formatQuantity(item.tipo, item.quantidade) }}
       </td>
       <td>{{ item.dataMovimentacao }}</td>
       <td>
         <VChip
-          :color="item.type === 'Entrada' ? 'success' : 'error'"
+          :color="item.tipo === 'Entrada' ? 'success' : 'error'"
           variant="elevated"
         >
-          {{ item.type }}
+          {{ item.tipo }}
         </VChip>
       </td>
     </tr>

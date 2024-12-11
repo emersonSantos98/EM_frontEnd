@@ -41,6 +41,12 @@ export default [
             action: 'manage',
             subject: 'all',
           },
+          {
+            title: 'Movimentação de Estoque',
+            to: 'apps-workshop-product-stock-movement',
+            action: 'manage',
+            subject: 'all',
+          },
         ],
       },
     ],
