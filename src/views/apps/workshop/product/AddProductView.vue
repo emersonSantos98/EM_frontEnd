@@ -24,7 +24,28 @@ const localVariations = ref([
 
 // Sugestões de valores para diferentes tipos de variações
 const suggestionMap = {
-  Cor: ['Preto', 'Azul', 'Branco', 'Vermelho', 'Verde'],
+  Cor: [
+    'Preto',
+    'Azul',
+    'Branco',
+    'Vermelho',
+    'Verde',
+    'Laranja Queimado',
+    'Verde Militar',
+    'Marsala',
+    'Amarelo',
+    'Roxo',
+    'Cinza',
+    'Marrom',
+    'Rosa Claro',
+    'Turquesa',
+    'Vinho',
+    'Lavanda',
+    'Bege',
+    'Oliva',
+    'Dourado',
+    'Prata',
+  ],
   Tamanho: ['P', 'M', 'G', 'GG', '34', '36', '38', '40'],
   Estampa: ['Listrado', 'Floral', 'Xadrez', 'Lisa'],
 }
