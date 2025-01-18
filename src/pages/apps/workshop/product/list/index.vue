@@ -13,11 +13,12 @@ const products = ref(productStore.products.produtos)
 // Headers da tabela
 const headers = [
   { title: '', key: 'data-table-expand' },
-  { title: 'NAME', key: 'nome' },
+  { title: 'Nome', key: 'nome' },
   { title: 'SKU', key: 'sku' },
-  { title: 'STATUS', key: 'status' },
-  { title: 'DATE', key: 'createdAt' },
-  { title: 'ACTIONS', key: 'actions' },
+  { title: 'Cor', key: 'cor' },
+  { title: 'Status', key: 'status' },
+  { title: 'Data de Criação', key: 'createdAt' },
+  { title: 'Ações', key: 'actions' },
 ]
 
 // Filtros
@@ -26,36 +27,21 @@ const searchQuery = ref('')
 
 // Função para resolver o status
 function resolveStatusVariant(status: string) {
-  if (status === 'ativo')
-    return { color: 'success', text: 'Active' }
-  else if (status === 'inativo')
-    return { color: 'error', text: 'Inactive' }
-  else
-    return { color: 'info', text: 'Unknown' }
+  if (status === 'ativo') return { color: 'success', text: 'Ativo' }
+  if (status === 'inativo') return { color: 'error', text: 'Inativo' }
+  return { color: 'info', text: 'Desconhecido' }
 }
+
 function formatData(data: string) {
   return new Date(data).toLocaleDateString()
 }
 
-// Função para gerar as iniciais do nome, garantindo que fullName é uma string válida
-function avatarText(fullName?: string) {
-  if (!fullName)
-    return 'N/A'
-  const names = fullName.split(' ')
-
-  return names.length > 1
-    ? (names[0][0] + names[names.length - 1][0]).toUpperCase()
-    : names[0][0].toUpperCase()
-}
-
 // Buscar os produtos da API na montagem do componente
 async function fetchProducts() {
-  await productStore.findAllProduct(
-    {
-      status: selectedStatus.value,
-      search: searchQuery.value,
-    },
-  )
+  await productStore.findAllProduct({
+    status: selectedStatus.value,
+    search: searchQuery.value,
+  })
   products.value = productStore.products.produtos
 }
 
@@ -65,29 +51,23 @@ onMounted(() => {
 })
 
 // Função para deletar um produto
-function deletePartner(id: string) {
+function deleteProduct(id: string) {
   productStore.deleteProduct(id)
   products.value = products.value.filter(product => product.id !== id)
 }
 
-// Atualizar sempre que filtros ou paginação mudarem
+// Atualizar sempre que filtros mudarem
 watch([selectedStatus, searchQuery], fetchProducts)
 </script>
 
 <template>
   <div>
     <!-- Filtros -->
-    <VCard
-      title="Filtros"
-      class="mb-6"
-    >
+    <VCard title="Filtros" class="mb-6">
       <VCardText>
         <VRow>
           <!-- Buscar -->
-          <VCol
-            cols="12"
-            sm="8"
-          >
+          <VCol cols="12" sm="8">
             <AppTextField
               v-model="searchQuery"
               placeholder="Buscar pelo nome"
@@ -95,10 +75,7 @@ watch([selectedStatus, searchQuery], fetchProducts)
             />
           </VCol>
           <!-- Status -->
-          <VCol
-            cols="12"
-            sm="4"
-          >
+          <VCol cols="12" sm="4">
             <AppSelect
               v-model="selectedStatus"
               placeholder="Status"
@@ -121,48 +98,54 @@ watch([selectedStatus, searchQuery], fetchProducts)
         Adicionar Produto
       </VBtn>
     </div>
+
+    <!-- Tabela de Produtos -->
     <VDataTable
       :headers="headers"
       :items="products"
       :items-per-page="5"
       expand-on-click
     >
-      <!-- Linha expandida -->
+      <!-- Linha expandida com subtabela de variações -->
       <template #expanded-row="slotProps">
-        <tr class="v-data-table__tr">
+        <tr>
           <td :colspan="headers.length">
-            <div class="d-flex flex-column my-1">
-              <div
-                v-for="variacao in slotProps.item.raw.variacoes"
-                :key="variacao.cor"
-                class="d-flex align-items-center mb-2"
+            <div class="subtable-container">
+              <h5>Variações</h5>
+              <VDataTable
+                :headers="[
+                  { title: 'Tamanho', key: 'tamanho' },
+                  { title: 'Estampa', key: 'estampa' },
+                  { title: 'Estoque', key: 'estoque' },
+                  { title: 'SKU', key: 'sku' },
+                  { title: 'Ações', key: 'actions' },
+                ]"
+                :items="slotProps.item.raw.variacoes"
+                items-per-page-hidden
               >
-                <div class="me-3">
-                  <strong>Cor:</strong>
-                  <VChip
-                    label
-                    color="secondary"
-                    variant="elevated"
-                    class="me-2"
-                  >
-                    {{ variacao.cor }}
-                  </VChip>
-                </div>
-                <div>
-                  <strong>Tamanhos:</strong>
-                  <div class="d-flex flex-wrap gap-2">
-                    <VChip
-                      v-for="tamanho in variacao.tamanhos"
-                      :key="tamanho"
-                      label
-                      color="secondary"
-                      variant="elevated"
-                    >
-                      {{ tamanho }}
-                    </VChip>
-                  </div>
-                </div>
-              </div>
+                <!-- Coluna Tamanho -->
+                <template #item.tamanho="{ item }">
+                  <span>{{ item.value.tamanho }}</span>
+                </template>
+                <!-- Coluna Estampa -->
+                <template #item.estampa="{ item }">
+                  <span>{{ item.value.estampa }}</span>
+                </template>
+                <!-- Coluna Estoque -->
+                <template #item.estoque="{ item }">
+                  <span>{{ item.value.estoque }}</span>
+                </template>
+                <!-- Coluna SKU -->
+                <template #item.sku="{ item }">
+                  <span>{{ item.value.sku }}</span>
+                </template>
+                <!-- Coluna Ações -->
+                <template #item.actions="{ item }">
+                  <IconBtn color="error" @click="deleteProduct(item.raw.id)">
+                    <VIcon icon="tabler-trash" />
+                  </IconBtn>
+                </template>
+              </VDataTable>
             </div>
           </td>
         </tr>
@@ -172,36 +155,39 @@ watch([selectedStatus, searchQuery], fetchProducts)
       <template #item.nome="{ item }">
         <div class="d-flex align-center">
           <VAvatar
-            size="32"
-            color="primary"
-            class="v-avatar-light-bg primary--text"
+            v-if="item.raw.imagem"
+            size="38"
             variant="tonal"
-          >
-            <span>{{ avatarText(item.raw.nome) }}</span>
-          </VAvatar>
-          <div class="d-flex flex-column ms-3">
-            <span class="d-block font-weight-medium text-high-emphasis text-truncate">{{ item.raw.nome }}</span>
-            <small>{{ item.raw.sku }}</small>
+            rounded
+            :image="item.raw.imagem"
+          />
+          <div class="ms-3">
+            <span class="font-weight-medium">{{ item.raw.nome }}</span>
           </div>
         </div>
+      </template>
+
+      <!-- Coluna Cor -->
+      <template #item.cor="{ item }">
+        <span>{{ item.raw.cor }}</span>
       </template>
 
       <!-- Coluna Status -->
       <template #item.status="{ item }">
         <VChip
           :color="resolveStatusVariant(item.raw.status).color"
-          class="font-weight-medium"
           size="small"
         >
           {{ resolveStatusVariant(item.raw.status).text }}
         </VChip>
       </template>
+
       <!-- Coluna Data -->
       <template #item.createdAt="{ item }">
         <span>{{ formatData(item.raw.createdAt) }}</span>
       </template>
 
-      <!-- Ações -->
+      <!-- Coluna Ações -->
       <template #item.actions="{ item }">
         <IconBtn
           color="primary"
@@ -209,10 +195,7 @@ watch([selectedStatus, searchQuery], fetchProducts)
         >
           <VIcon icon="tabler-edit" />
         </IconBtn>
-        <IconBtn
-          color="error"
-          @click="deletePartner(item.raw.id)"
-        >
+        <IconBtn color="error" @click="deleteProduct(item.raw.id)">
           <VIcon icon="tabler-trash" />
         </IconBtn>
       </template>
@@ -220,34 +203,10 @@ watch([selectedStatus, searchQuery], fetchProducts)
   </div>
 </template>
 
-<style lang="scss" scoped>
-.v-card {
-  .variation-card {
-    padding: 1rem;
-    border-radius: 8px;
-
-    h4 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .btn-small {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      min-height: 28px;
-      padding: 0;
-    }
-
-    .variation-input-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .form-control {
-      width: 100%;
-    }
-  }
+<style scoped>
+.subtable-container {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 </style>
