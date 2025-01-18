@@ -1,17 +1,19 @@
 export interface ProductType {
-  id: string
   nome: string
   descricao: string
   sku: string
   status: string
+  cor: string
+  imagem: string
 }
 
 export interface IQueryVariation {
   id: string
   tamanho: string
-  cor: string
+  estampa: string
+  estoque: number
+  sku: string
 }
-
 export interface IQueryProduct {
   search: string
   limit: number

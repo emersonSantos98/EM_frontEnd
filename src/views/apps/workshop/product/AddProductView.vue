@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineEmits, defineProps, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import type { IQueryVariation, ProductType } from '@/views/apps/workshop/product/types'
 
-// Props recebidas
+// Props recebidas do componente pai
 const props = defineProps({
   product: {
     type: Object as () => ProductType,
@@ -14,255 +14,243 @@ const props = defineProps({
   },
 })
 
-// Emissor de eventos
-const emit = defineEmits(['update:variations'])
+// Emissor de eventos para atualizar os dados no componente pai
+const emit = defineEmits(['update:variations', 'update:product'])
 
-// Estado local das variações (usado para adicionar/remover variações)
-const localVariations = ref([
-  { id: 1, type: '', options: [''] },
-])
+// Local state para gerenciamento interno
+const selectedImage = ref<string | null>(null)
 
-// Sugestões de valores para diferentes tipos de variações
-const suggestionMap = {
-  Cor: [
-    'Preto',
-    'Azul',
-    'Branco',
-    'Vermelho',
-    'Verde',
-    'Laranja Queimado',
-    'Verde Militar',
-    'Marsala',
-    'Amarelo',
-    'Roxo',
-    'Cinza',
-    'Marrom',
-    'Rosa Claro',
-    'Turquesa',
-    'Vinho',
-    'Lavanda',
-    'Bege',
-    'Oliva',
-    'Dourado',
-    'Prata',
-  ],
-  Tamanho: ['P', 'M', 'G', 'GG', '34', '36', '38', '40'],
-  Estampa: ['Listrado', 'Floral', 'Xadrez', 'Lisa'],
-}
+// Observa alterações no produto para resetar a imagem
+watch(
+  () => props.product.imagem,
+  newImage => {
+    if (!newImage)
+      selectedImage.value = null
+  },
+)
 
-// Função para montar as variações no formato correto
-function updateParentVariations() {
-  const formattedVariations: IQueryVariation[] = []
+// Upload de imagem com pré-visualização
+function handleImageUpload(event: Event) {
+  const fileInput = event.target as HTMLInputElement
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0]
 
-  localVariations.value.forEach(variation => {
-    if (variation.type === 'Cor' || variation.type === 'Estampa') {
-      variation.options.forEach(option => {
-        if (variation.type === 'Cor') {
-          if (localVariations.value.some(v => v.type === 'Tamanho')) {
-            localVariations.value
-              .filter(v => v.type === 'Tamanho')
-              .forEach(sizeVariation => {
-                sizeVariation.options.forEach(sizeOption => {
-                  formattedVariations.push({ tamanho: sizeOption, cor: option })
-                })
-              })
-          }
-          else {
-            formattedVariations.push({ cor: option })
-          }
-        }
-        else if (variation.type === 'Estampa') {
-          if (localVariations.value.some(v => v.type === 'Tamanho')) {
-            localVariations.value
-              .filter(v => v.type === 'Tamanho')
-              .forEach(sizeVariation => {
-                sizeVariation.options.forEach(sizeOption => {
-                  formattedVariations.push({ tamanho: sizeOption, estampa: option })
-                })
-              })
-          }
-          else {
-            formattedVariations.push({ estampa: option })
-          }
-        }
-      })
+    props.product.imagem = file
+
+    // Gera a pré-visualização da imagem
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      selectedImage.value = reader.result as string
     }
-  })
-
-  emit('update:variations', formattedVariations)
+    reader.readAsDataURL(file)
+    emit('update:product', { ...props.product }) // Emite a alteração para o pai
+  }
 }
 
-// Função para adicionar uma nova variação
+// Adiciona uma nova variação
 function addVariation() {
-  if (localVariations.value.length < 2) {
-    localVariations.value.push({ id: localVariations.value.length + 1, type: '', options: [''] })
-    updateParentVariations()
+  const newVariation: IQueryVariation = {
+    id: `${Date.now()}`, // Gera um ID único
+    tamanho: '',
+    estampa: '',
+    estoque: 0,
+    sku: '',
   }
+
+  props.variations.push(newVariation)
+  emit('update:variations', [...props.variations])
 }
 
-// Função para remover uma variação existente
-function removeVariation(id) {
-  localVariations.value = localVariations.value.filter(variation => variation.id !== id)
-  updateParentVariations()
+// Remove uma variação
+function removeVariation(index: number) {
+  props.variations.splice(index, 1)
+  emit('update:variations', [...props.variations])
 }
-
-// Função para adicionar uma nova opção a uma variação específica
-function addOption(variationIndex) {
-  localVariations.value[variationIndex].options.push('')
-  updateParentVariations()
-}
-
-// Função para remover uma opção específica de uma variação
-function removeOption(variationIndex, optionIndex) {
-  if (localVariations.value[variationIndex].options.length > 1) {
-    localVariations.value[variationIndex].options.splice(optionIndex, 1)
-    updateParentVariations()
-  }
-}
-
-// Observa mudanças no array de variações locais e emite quando ocorrerem
-watch(localVariations, () => {
-  updateParentVariations()
-}, { deep: true })
 </script>
 
 <template>
   <div>
     <VRow>
       <VCol md="12">
-        <!-- 👉 Product Information -->
-        <VCard
-          class="mb-6"
-          title="Informações do Produto"
-        >
+        <!-- Informações do Produto -->
+        <VCard class="mb-6">
+          <VCardTitle>Informações do Produto</VCardTitle>
           <VCardText>
             <VRow>
+              <!-- Nome do Produto -->
               <VCol
                 cols="12"
                 md="6"
               >
-                <AppTextField
+                <VTextField
                   v-model="props.product.nome"
                   label="Nome do Produto"
-                  placeholder="Camiseta Masculina"
+                  placeholder="Ex.: Camisa Vermelha"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
                 />
               </VCol>
+
+              <!-- SKU -->
               <VCol
                 cols="12"
                 md="6"
               >
-                <AppTextField
+                <VTextField
                   v-model="props.product.sku"
                   label="SKU"
-                  placeholder="SKU-1234"
+                  placeholder="Ex.: CAMVER001"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
                 />
               </VCol>
+
+              <!-- Cor -->
               <VCol
                 cols="12"
-                md="12"
+                md="6"
               >
-                <span class="mb-1">Descrição do Produto</span>
-                <TiptapEditor
-                  v-model="props.product.descricao"
-                  placeholder="Descrição do Produto"
-                  class="border rounded"
+                <VTextField
+                  v-model="props.product.cor"
+                  label="Cor"
+                  placeholder="Digite a cor do produto"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
                 />
+              </VCol>
+
+              <!-- Descrição -->
+              <VCol cols="12">
+                <VTextarea
+                  v-model="props.product.descricao"
+                  label="Descrição do Produto"
+                  placeholder="Digite uma descrição detalhada..."
+                  rows="4"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
+                />
+              </VCol>
+
+              <!-- Upload de Imagem -->
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <label
+                  for="productImage"
+                  class="mb-2 d-block"
+                >Imagem do Produto</label>
+                <VFileInput
+                  id="productImage"
+                  label="Selecione uma imagem"
+                  accept="image/*"
+                  outlined
+                  @change="handleImageUpload"
+                />
+                <!-- Pré-visualização da Imagem -->
+                <div
+                  v-if="selectedImage"
+                  class="mt-4 text-center"
+                >
+                  <img
+                    :src="selectedImage"
+                    alt="Pré-visualização"
+                    class="preview-image"
+                  >
+                </div>
               </VCol>
             </VRow>
           </VCardText>
         </VCard>
 
-        <!-- Variations Card -->
-        <VCard
-          title="Variações"
-          class="mb-6"
-        >
+        <!-- Variações -->
+        <VCard class="mb-6">
+          <VCardTitle>Variações</VCardTitle>
           <VCardText>
-            <template
-              v-for="(variation, index) in localVariations"
+            <VRow
+              v-for="(variation, index) in props.variations"
               :key="variation.id"
+              class="align-center mb-3"
             >
-              <VAlert
-                color="secondary"
-                variant="outlined"
-                class="mb-3 position-relative variation-card"
+              <!-- Tamanho -->
+              <VCol
+                cols="12"
+                md="3"
               >
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h4 class="mb-0">
-                    Variação {{ variation.id }}
-                  </h4>
-                  <div class="flex-grow-1" />
-                  <VBtn
-                    icon
-                    color="error"
-                    class="btn-small"
-                    @click="removeVariation(variation.id)"
-                  >
-                    <VIcon>mdi-close</VIcon>
-                  </VBtn>
-                </div>
-                <VRow class="align-items-center">
-                  <!-- Tipo da Variação -->
-                  <VCol
-                    cols="12"
-                    md="4"
-                  >
-                    <AppSelect
-                      v-model="variation.type"
-                      :items="['Tamanho', 'Cor', 'Estampa']"
-                      placeholder="Selecionar Tipo"
-                      class="form-control"
-                    />
-                  </VCol>
+                <VAutocomplete
+                  v-model="variation.tamanho"
+                  label="Tamanho"
+                  :items="['P', 'M', 'G', 'GG']"
+                  placeholder="Selecione o Tamanho"
+                  outlined
+                />
+              </VCol>
 
-                  <!-- Inputs de valores dinâmicos -->
-                  <template
-                    v-for="(option, optIndex) in variation.options"
-                    v-if="variation.type"
-                    :key="optIndex"
-                  >
-                    <VCol
-                      cols="12"
-                      md="4"
-                      class="d-flex align-items-center gap-2 variation-input-group"
-                    >
-                      <AppAutocomplete
-                        v-model="variation.options[optIndex]"
-                        :items="suggestionMap[variation.type] || []"
-                        placeholder="Adicionar Valor"
-                        class="form-control"
-                      />
-                      <VBtn
-                        icon
-                        color="success"
-                        class="btn-small"
-                        @click="addOption(index)"
-                      >
-                        <VIcon>mdi-plus</VIcon>
-                      </VBtn>
-                      <VBtn
-                        v-if="variation.options.length > 1"
-                        icon
-                        color="error"
-                        class="btn-small"
-                        @click="removeOption(index, optIndex)"
-                      >
-                        <VIcon>mdi-delete</VIcon>
-                      </VBtn>
-                    </VCol>
-                  </template>
-                </VRow>
-              </VAlert>
-            </template>
-            <div class="d-flex gap-4 align-center">
-              <VBtn
-                v-if="localVariations.length < 2"
-                color="primary"
-                @click="addVariation"
+              <!-- Estampa -->
+              <VCol
+                cols="12"
+                md="3"
               >
-                Adicionar Variação
-              </VBtn>
-            </div>
+                <VAutocomplete
+                  v-model="variation.estampa"
+                  label="Estampa"
+                  :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']"
+                  placeholder="Selecione a Estampa"
+                  outlined
+                />
+              </VCol>
+
+              <!-- Estoque -->
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VTextField
+                  v-model="variation.estoque"
+                  label="Estoque"
+                  type="number"
+                  placeholder="Quantidade"
+                  outlined
+                />
+              </VCol>
+
+              <!-- SKU -->
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VTextField
+                  v-model="variation.sku"
+                  label="SKU da Variação"
+                  placeholder="Ex.: CAMVER001-M"
+                  outlined
+                />
+              </VCol>
+
+              <!-- Remover Variação -->
+              <VCol
+                cols="12"
+                class="d-flex justify-end"
+              >
+                <VBtn
+                  icon
+                  color="error"
+                  @click="removeVariation(index)"
+                >
+                  <VIcon>mdi-delete</VIcon>
+                </VBtn>
+              </VCol>
+            </VRow>
+
+            <!-- Adicionar Nova Variação -->
+            <VBtn
+              color="primary"
+              class="mt-4"
+              @click="addVariation"
+            >
+              Adicionar Variação
+            </VBtn>
           </VCardText>
         </VCard>
       </VCol>
@@ -270,34 +258,12 @@ watch(localVariations, () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.v-card {
-  .variation-card {
-    padding: 1rem;
-    border-radius: 8px;
-
-    h4 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .btn-small {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      min-height: 28px;
-      padding: 0;
-    }
-
-    .variation-input-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .form-control {
-      width: 100%;
-    }
-  }
+<style scoped>
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 </style>

@@ -12,15 +12,26 @@ export const useProductStore = defineStore('product', {
     findOne: null as ProductType | null,
   }),
   actions: {
-    async addProduct(productData: { produto: ProductType; variacoes: IQueryVariation[] }) {
+    // async addProduct(productData: { produto: ProductType; variacoes: IQueryVariation[] }) {
+    //   try {
+    //     await new ProductService().addProduct(productData)
+    //     this.products.produtos.push(productData.produto)
+    //   }
+    //   catch (error) {
+    //     console.error('Erro ao adicionar produto:', error)
+    //   }
+    // },
+
+    async addProduct(formData: FormData) {
       try {
-        await new ProductService().addProduct(productData)
-        this.products.produtos.push(productData.produto)
-      }
-      catch (error) {
+        // Envia os dados para o backend
+        await new ProductService().addProduct(formData)
+        console.log('Produto salvo com sucesso!')
+      } catch (error) {
         console.error('Erro ao adicionar produto:', error)
       }
     },
+
     async findAllProduct(query: IQueryProduct) {
       this.loadingProducts = true
       try {

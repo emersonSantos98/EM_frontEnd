@@ -10,14 +10,15 @@ const productStore = useProductStore()
 
 // Form state
 const formRef = ref<VForm | null>(null)
-
 provide('formRef', formRef)
 
 const product = ref<ProductType>({
   nome: '',
   descricao: '',
+  cor: '',
   sku: '',
   status: 'ativo',
+  imagem: null,
 })
 
 const variations = ref<IQueryVariation[]>([])
@@ -25,17 +26,46 @@ const variations = ref<IQueryVariation[]>([])
 // Salvar produto com variações
 async function saveProduct() {
   try {
-    const productData = {
-      produto: product.value,
-      variacoes: variations.value,
+    const formData = new FormData()
+
+    // Monta os dados do produto no formato exigido pelo backend
+    formData.append(
+      'json',
+      JSON.stringify({
+        ...product.value,
+        variacoes: variations.value,
+      }),
+    )
+
+    // Adiciona a imagem ao formulário
+    if (product.value.imagem) {
+      formData.append('image', product.value.imagem as File)
     }
 
-    // Chama a store para adicionar o produto
-    await productStore.addProduct(productData)
-  }
-  catch (error) {
+    // Chama a store para salvar o produto
+    await productStore.addProduct(formData)
+
+    // Limpa os campos do formulário
+    resetForm()
+
+    // Redireciona para a lista de produtos
+    $router.push('/apps/workshop/product/list')
+  } catch (error) {
     console.error('Erro ao salvar produto:', error)
   }
+}
+
+// Reseta os campos do formulário
+function resetForm() {
+  product.value = {
+    nome: '',
+    descricao: '',
+    cor: '',
+    sku: '',
+    status: 'ativo',
+    imagem: null,
+  }
+  variations.value = []
 }
 </script>
 
@@ -58,19 +88,19 @@ async function saveProduct() {
         <VIcon icon="tabler-arrow-big-left-lines" />
         Voltar
       </VBtn>
+      <VBtn
+        color="success"
+        :disabled="!product.nome || !product.sku || !product.cor || variations.length === 0"
+        @click="saveProduct"
+      >
+        Salvar Produto
+      </VBtn>
     </div>
     <!-- Formulário de adição de produto -->
     <AddProductView
       v-model:variations="variations"
       v-model:product="product"
-      class="mt-4"
+      class="mt-4 mb-12"
     />
-    <!-- Botão Salvar -->
-    <VBtn
-      color="success"
-      @click="saveProduct"
-    >
-      Salvar Produto
-    </VBtn>
   </div>
 </template>
