@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { IQueryProduct, IQueryVariation, ProductType } from './types'
+import type { IQueryProduct, ProductType } from './types'
 import ProductService from '@/services/workshop/product.service'
 
 export const useProductStore = defineStore('product', {
@@ -12,26 +12,16 @@ export const useProductStore = defineStore('product', {
     findOne: null as ProductType | null,
   }),
   actions: {
-    // async addProduct(productData: { produto: ProductType; variacoes: IQueryVariation[] }) {
-    //   try {
-    //     await new ProductService().addProduct(productData)
-    //     this.products.produtos.push(productData.produto)
-    //   }
-    //   catch (error) {
-    //     console.error('Erro ao adicionar produto:', error)
-    //   }
-    // },
-
     async addProduct(formData: FormData) {
       try {
         // Envia os dados para o backend
         await new ProductService().addProduct(formData)
         console.log('Produto salvo com sucesso!')
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Erro ao adicionar produto:', error)
       }
     },
-
     async findAllProduct(query: IQueryProduct) {
       this.loadingProducts = true
       try {
@@ -42,6 +32,15 @@ export const useProductStore = defineStore('product', {
       }
       this.loadingProducts = false
     },
+    async findOneProduct(id: number) {
+      try {
+        await new ProductService().findOneProduct(id)
+        console.log('Produto encontrado com sucesso!')
+      }
+      catch (error) {
+        console.error('Erro ao buscar produto:', error)
+      }
+    },
     async deleteProduct(id: number) {
       try {
         await new ProductService().deleteProduct(id)
@@ -50,7 +49,14 @@ export const useProductStore = defineStore('product', {
         console.error('Erro ao deletar produto:', error)
       }
     },
-
+    async updateProduct(id: number, formData: FormData) {
+      try {
+        await new ProductService().updateProduct(id, formData)
+      }
+      catch (error) {
+        console.error('Erro ao atualizar produto:', error)
+      }
+    },
   },
 })
 
@@ -59,7 +65,9 @@ export interface IUseProductStore {
     count: number
     produtos: ProductType[]
   }
+  findOne: ProductType | null
   loadingProducts: boolean
   addProduct: (partner: ProductType) => Promise<void>
-
+  findAllProduct: (query: IQueryProduct) => Promise<void>
+  findOneProduct: (id: number) => Promise<void>
 }
