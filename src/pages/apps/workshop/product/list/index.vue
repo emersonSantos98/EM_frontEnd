@@ -112,40 +112,51 @@ watch([selectedStatus, searchQuery], fetchProducts)
           <td :colspan="headers.length">
             <div class="subtable-container">
               <h5>Variações</h5>
-              <VDataTable
-                :headers="[
-                  { title: 'Tamanho', key: 'tamanho' },
-                  { title: 'Estampa', key: 'estampa' },
-                  { title: 'Estoque', key: 'estoque' },
-                  { title: 'SKU', key: 'sku' },
-                  { title: 'Ações', key: 'actions' },
-                ]"
-                :items="slotProps.item.raw.variacoes"
-                items-per-page-hidden
-              >
-                <!-- Coluna Tamanho -->
-                <template #item.tamanho="{ item }">
-                  <span>{{ item.value.tamanho }}</span>
-                </template>
-                <!-- Coluna Estampa -->
-                <template #item.estampa="{ item }">
-                  <span>{{ item.value.estampa }}</span>
-                </template>
-                <!-- Coluna Estoque -->
-                <template #item.estoque="{ item }">
-                  <span>{{ item.value.estoque }}</span>
-                </template>
-                <!-- Coluna SKU -->
-                <template #item.sku="{ item }">
-                  <span>{{ item.value.sku }}</span>
-                </template>
-                <!-- Coluna Ações -->
-                <template #item.actions="{ item }">
-                  <IconBtn color="error" @click="deleteProduct(item.raw.id)">
-                    <VIcon icon="tabler-trash" />
-                  </IconBtn>
-                </template>
-              </VDataTable>
+              <VTable class="text-no-wrap">
+                <thead>
+                <tr>
+                  <th class="text-uppercase">
+                    Tamanho
+                  </th>
+                  <th class="yexy-no-wrap">
+                    Estampa
+                  </th>
+                  <th class="text-uppercase">
+                    Estoque
+                  </th>
+                  <th class="text-uppercase">
+                    SKU
+                  </th>
+                  <th class="text-uppercase">
+                    Ações
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                  v-for="item in slotProps.item.raw.variacoes"
+                  :key="item.variacaoId"
+                >
+                  <td>
+                    {{ item.tamanho  }}
+                  </td>
+                  <td>
+                    {{ item.estampa  }}
+                  </td>
+                  <td>
+                    {{  item.estoque  }}
+                  </td>
+                  <td>
+                    {{ item.sku}}
+                  </td>
+                  <td>
+                    <IconBtn color="error" @click="deleteProduct(item)">
+                      <VIcon icon="tabler-trash" />
+                    </IconBtn>
+                  </td>
+                </tr>
+                </tbody>
+              </VTable>
             </div>
           </td>
         </tr>
