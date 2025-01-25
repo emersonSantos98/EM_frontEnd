@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import type { IQueryVariation, ProductType } from '@/views/apps/workshop/product/types'
 
-// Props recebidas do componente pai
+// Props recebidas do componente pai (product e variations)
 const props = defineProps({
   product: {
     type: Object as () => ProductType,
@@ -14,19 +14,36 @@ const props = defineProps({
   },
 })
 
-// Emissor de eventos para atualizar os dados no componente pai
-const emit = defineEmits(['update:variations', 'update:product'])
+// Emite eventos para atualizar o pai (v-model)
+const emit = defineEmits(['update:product', 'update:variations'])
 
-// Local state para gerenciamento interno
+// Preview da imagem (string base64 ou URL)
 const selectedImage = ref<string | null>(null)
 
-// Observa alterações no produto para resetar a imagem
+/**
+ * Observa "props.product.imagem".
+ * Se for nulo, reseta preview;
+ * Se for File, faz FileReader;
+ * Se for string, assume que é URL/caminho vindo do backend.
+ */
 watch(
   () => props.product.imagem,
   newImage => {
-    if (!newImage)
+    if (!newImage) {
       selectedImage.value = null
+    } else if (newImage instanceof File) {
+      // Faz a leitura do File para exibir base64
+      const reader = new FileReader()
+      reader.onload = () => {
+        selectedImage.value = reader.result as string
+      }
+      reader.readAsDataURL(newImage)
+    } else if (typeof newImage === 'string') {
+      // Se for string, consideramos que é a URL/caminho da imagem antiga
+      selectedImage.value = newImage
+    }
   },
+  { immediate: true },
 )
 
 // Upload de imagem com pré-visualização
@@ -35,23 +52,25 @@ function handleImageUpload(event: Event) {
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0]
 
+    // Seta no product como File
     props.product.imagem = file
 
-    // Gera a pré-visualização da imagem
+    // Gera pré-visualização
     const reader = new FileReader()
-
     reader.onload = () => {
       selectedImage.value = reader.result as string
     }
     reader.readAsDataURL(file)
-    emit('update:product', { ...props.product }) // Emite a alteração para o pai
+
+    // Emite para o pai
+    emit('update:product', { ...props.product })
   }
 }
 
-// Adiciona uma nova variação
+// Adiciona uma nova variação (sem ID!)
 function addVariation() {
   const newVariation: IQueryVariation = {
-    id: `${Date.now()}`, // Gera um ID único
+    // Não define id => variação nova
     tamanho: '',
     estampa: '',
     estoque: 0,
@@ -62,7 +81,7 @@ function addVariation() {
   emit('update:variations', [...props.variations])
 }
 
-// Remove uma variação
+// Remove uma variação pelo índice
 function removeVariation(index: number) {
   props.variations.splice(index, 1)
   emit('update:variations', [...props.variations])
@@ -73,12 +92,12 @@ function removeVariation(index: number) {
   <div>
     <VRow>
       <VCol md="12">
-        <!-- Informações do Produto -->
+        <!-- Card com informações do Produto -->
         <VCard class="mb-6">
           <VCardTitle>Informações do Produto</VCardTitle>
           <VCardText>
             <VRow>
-              <!-- Nome do Produto -->
+              <!-- Nome -->
               <VCol
                 cols="12"
                 md="6"
@@ -86,7 +105,6 @@ function removeVariation(index: number) {
                 <VTextField
                   v-model="props.product.nome"
                   label="Nome do Produto"
-                  placeholder="Ex.: Camisa Vermelha"
                   outlined
                   @input="emit('update:product', { ...props.product })"
                 />
@@ -100,7 +118,6 @@ function removeVariation(index: number) {
                 <VTextField
                   v-model="props.product.sku"
                   label="SKU"
-                  placeholder="Ex.: CAMVER001"
                   outlined
                   @input="emit('update:product', { ...props.product })"
                 />
@@ -114,7 +131,6 @@ function removeVariation(index: number) {
                 <VTextField
                   v-model="props.product.cor"
                   label="Cor"
-                  placeholder="Digite a cor do produto"
                   outlined
                   @input="emit('update:product', { ...props.product })"
                 />
@@ -125,7 +141,6 @@ function removeVariation(index: number) {
                 <VTextarea
                   v-model="props.product.descricao"
                   label="Descrição do Produto"
-                  placeholder="Digite uma descrição detalhada..."
                   rows="4"
                   outlined
                   @input="emit('update:product', { ...props.product })"
@@ -140,7 +155,9 @@ function removeVariation(index: number) {
                 <label
                   for="productImage"
                   class="mb-2 d-block"
-                >Imagem do Produto</label>
+                >
+                  Imagem do Produto
+                </label>
                 <VFileInput
                   id="productImage"
                   label="Selecione uma imagem"
@@ -148,7 +165,7 @@ function removeVariation(index: number) {
                   outlined
                   @change="handleImageUpload"
                 />
-                <!-- Pré-visualização da Imagem -->
+                <!-- Pré-visualização da Imagem (pode ser base64 ou URL) -->
                 <div
                   v-if="selectedImage"
                   class="mt-4 text-center"
@@ -164,91 +181,64 @@ function removeVariation(index: number) {
           </VCardText>
         </VCard>
 
-        <!-- Variações -->
+        <!-- Card com variações -->
         <VCard class="mb-6">
           <VCardTitle>Variações</VCardTitle>
           <VCardText>
             <VRow
               v-for="(variation, index) in props.variations"
-              :key="variation.id"
+              :key="index"
               class="align-center mb-3"
             >
               <!-- Tamanho -->
-              <VCol
-                cols="12"
-                md="3"
-              >
+              <VCol cols="12" md="3">
                 <VAutocomplete
                   v-model="variation.tamanho"
                   label="Tamanho"
                   :items="['P', 'M', 'G', 'GG']"
-                  placeholder="Selecione o Tamanho"
                   outlined
                 />
               </VCol>
 
               <!-- Estampa -->
-              <VCol
-                cols="12"
-                md="3"
-              >
+              <VCol cols="12" md="3">
                 <VAutocomplete
                   v-model="variation.estampa"
                   label="Estampa"
                   :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']"
-                  placeholder="Selecione a Estampa"
                   outlined
                 />
               </VCol>
 
               <!-- Estoque -->
-              <VCol
-                cols="12"
-                md="3"
-              >
+              <VCol cols="12" md="3">
                 <VTextField
                   v-model="variation.estoque"
                   label="Estoque"
                   type="number"
-                  placeholder="Quantidade"
                   outlined
                 />
               </VCol>
 
-              <!-- SKU -->
-              <VCol
-                cols="12"
-                md="3"
-              >
+              <!-- SKU da variação -->
+              <VCol cols="12" md="3">
                 <VTextField
                   v-model="variation.sku"
                   label="SKU da Variação"
-                  placeholder="Ex.: CAMVER001-M"
                   outlined
                 />
               </VCol>
 
-              <!-- Remover Variação -->
-              <VCol
-                cols="12"
-                class="d-flex justify-end"
-              >
-                <VBtn
-                  icon
-                  color="error"
-                  @click="removeVariation(index)"
-                >
+              <!-- Remover -->
+              <VCol cols="12" class="d-flex justify-end">
+                <VBtn icon color="error" @click="removeVariation(index)">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </VCol>
             </VRow>
 
-            <!-- Adicionar Nova Variação -->
-            <VBtn
-              color="primary"
-              class="mt-4"
-              @click="addVariation"
-            >
+            <!-- Botão para adicionar variação -->
+            <VBtn color="primary" class="mt-4" @click="addVariation">
               Adicionar Variação
             </VBtn>
           </VCardText>
