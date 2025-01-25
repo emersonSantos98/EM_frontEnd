@@ -68,10 +68,6 @@ export default class ProductService {
     try {
       await this.client.update(id, partner)
 
-      const index = this.store.products.rows.findIndex(p => p.id === partner)
-      if (index !== -1)
-        this.store.products.rows[index] = { ...this.store.products.rows[index], ...partner }
-
       this.notifier.success('Produto atualizado com sucesso!')
     }
     catch (err: any) {
