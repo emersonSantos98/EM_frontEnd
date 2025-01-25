@@ -1,163 +1,140 @@
 <script setup lang="ts">
-import { defineProps, inject, reactive, watch } from 'vue'
-import { VForm } from 'vuetify/components'
-import type { PartnerType } from './types'
-import { usePartnerStore } from '@/views/apps/workshop/externalservices/usePartner'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useProductStore } from '@/views/apps/workshop/product/useProduct'
+import type { IQueryVariation, ProductType } from '@/views/apps/workshop/product/types'
 
-// Props
-const props = defineProps<{
-  partner: PartnerType | null
-}>()
+// Componente de formulário (reutilizado em criar e editar)
+import AddProductView from '@/views/apps/workshop/product/AddProductView.vue'
 
-// Store
-const partnerStore = usePartnerStore()
+// Router, Store e dados reativos
+const router = useRouter()
+const route = useRoute()
+const productStore = useProductStore()
 
-// Inject formRef
-const formRef = inject<typeof VForm | null>('formRef', null)
-
-// Local reactive copy of partner to ensure proper reactivity
-const localPartner = reactive<PartnerType>({
-  id: '',
-  name: '',
-  whatsapp: '',
+// Estado local (product + variations) que será ligado ao <AddProductView/>
+const product = ref<ProductType>({
+  nome: '',
+  descricao: '',
+  cor: '',
+  sku: '',
   status: 'ativo',
-  recebedor: '',
-  cep: '',
-  logradouro: '',
-  numero: '',
-  complemento: '',
-  bairro: '',
-  cidade: '',
-  estado: '',
-  tipo: '',
+  imagem: null, // Aqui pode ser File ou string (URL)
 })
 
-// Watch for changes in props.partner and sync to localPartner
+const variations = ref<IQueryVariation[]>([])
+
+// Pegamos o ID do produto a editar (depende de como está definida sua rota)
+const productId = route.params.all as string
+
+// Ao montar o componente, chamamos a Store para buscar o produto no backend
+onMounted(async () => {
+  try {
+    await productStore.findOneProduct(productId)
+  } catch (error) {
+    console.error('Erro ao buscar produto para edição:', error)
+    // redirecionar ou exibir mensagem de erro, se necessário
+  }
+})
+
+/**
+ * Observa "productStore.findOne".
+ * Quando o Store setar "findOne", copiamos para `product.value` e `variations.value`.
+ */
 watch(
-  () => props.partner,
-  (newVal) => {
-    if (newVal) {
-      Object.assign(localPartner, newVal)
+  () => productStore.findOne,
+  newVal => {
+    if (!newVal) return
+
+    // Ajustamos os campos do produto
+    product.value = {
+      nome: newVal.nome,
+      descricao: newVal.descricao,
+      cor: newVal.cor,
+      sku: newVal.sku,
+      status: newVal.status ?? 'ativo',
+      // Se o backend devolver a "imagem" como URL/caminho, guardamos como string
+      imagem: newVal.imagem || null,
     }
+
+    // Copiamos as variações
+    variations.value = newVal.variacoes || []
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 )
 
-// Validation rules
-const requiredRule = (v: string) => !!v || 'Campo obrigatório'
+// Função que envia o PUT ao backend, chamando o store
+async function updateProduct() {
+  try {
+    // Monta FormData
+    const formData = new FormData()
 
-function maxLengthRule(length: number) {
-  return (v: string) => v.length <= length || `Máximo de ${length} caracteres`
-}
+    // Monta o objeto JSON
+    formData.append(
+      'json',
+      JSON.stringify({
+        nome: product.value.nome,
+        descricao: product.value.descricao,
+        cor: product.value.cor,
+        sku: product.value.sku,
+        status: product.value.status,
+        variacoes: variations.value,
+      }),
+    )
 
-function stateRule(v: string) {
-  return /^[A-Z]{2}$/.test(v) || 'Insira um estado válido (Ex.: SP)'
-}
+    // Se "product.value.imagem" for um File, significa que o usuário trocou a imagem
+    if (product.value.imagem instanceof File) {
+      formData.append('image', product.value.imagem)
+    }
+    // Se for string (URL), não anexamos nada -> o backend mantém a imagem anterior
 
-// Format WhatsApp
-function formatWhatsApp(value: string): string {
-  const digits = value.replace(/\D/g, '')
+    // Chama o método do store para dar PUT /update/:id
+    await productStore.updateProduct(productId, formData)
 
-  return digits.length <= 10
-    ? digits.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
-    : digits.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
-}
-
-// Format CEP
-function formatCep(value: string): string {
-  const digits = value.replace(/\D/g, '')
-
-  return digits.replace(/(\d{5})(\d{0,3})/, '$1-$2')
-}
-
-// Save changes
-async function savePartnerChanges() {
-  if (formRef?.value?.validate()) {
-    await partnerStore.updatePartner(localPartner.id, localPartner)
-    console.log('Parceiro atualizado com sucesso:', localPartner)
-  } else {
-    console.log('Formulário inválido')
+    // Redireciona (ou faça algo após sucesso)
+    router.push('/apps/workshop/product/list')
+  } catch (error) {
+    console.error('Erro ao atualizar produto:', error)
   }
 }
 </script>
 
 <template>
   <div>
-    <VCard class="mb-6" title="Editar Parceiro">
-      <VCardText>
-        <VForm ref="formRef">
-          <VRow>
-            <VCol cols="4" md="6">
-              <VTextField
-                v-model="localPartner.name"
-                label="Nome"
-                placeholder="Digite o nome"
-                :rules="[requiredRule, maxLengthRule(100)]"
-                required
-              />
-            </VCol>
-            <VCol cols="4" md="6">
-              <VTextField
-                v-model="localPartner.whatsapp"
-                label="WhatsApp"
-                placeholder="(11) 93750-7856"
-                :rules="[maxLengthRule(15)]"
-                @input="localPartner.whatsapp = formatWhatsApp(localPartner.whatsapp)"
-              />
-            </VCol>
-            <VCol cols="4" md="6">
-              <VTextField v-model="localPartner.recebedor" label="Pix" placeholder="Pix do recebedor" />
-            </VCol>
-            <VCol cols="12" md="4">
-              <VSelect v-model="localPartner.status" :items="['ativo', 'inativo']" label="Status" />
-            </VCol>
-            <VCol cols="12" md="4">
-              <VTextField
-                v-model="localPartner.cep"
-                label="CEP"
-                placeholder="12345-678"
-                :rules="[maxLengthRule(9)]"
-                @input="localPartner.cep = formatCep(localPartner.cep)"
-              />
-            </VCol>
-            <VCol cols="12" md="4">
-              <VTextField
-                v-model="localPartner.estado"
-                label="Estado"
-                placeholder="Ex.: SP"
-                maxlength="2"
-                :rules="[requiredRule, stateRule]"
-              />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="localPartner.logradouro" label="Endereço" placeholder="Rua, Avenida..." />
-            </VCol>
-            <VCol cols="12" md="3">
-              <VTextField v-model="localPartner.numero" label="Número" placeholder="Número" />
-            </VCol>
-            <VCol cols="12" md="3">
-              <VTextField v-model="localPartner.complemento" label="Complemento" placeholder="Ex.: Apt 101" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="localPartner.bairro" label="Bairro" placeholder="Bairro" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="localPartner.cidade" label="Cidade" placeholder="Cidade" />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VSelect v-model="localPartner.tipo" :items="['oficina', 'costureira']" label="Tipo" :rules="[requiredRule]" required />
-            </VCol>
-          </VRow>
+    <div class="d-flex flex-wrap justify-between align-center gap-4 mb-6">
+      <div class="d-flex flex-column justify-center">
+        <h4 class="text-h4 font-weight-medium">
+          Editar Produto
+        </h4>
+        <span>Atualize as informações do produto</span>
+      </div>
+    </div>
 
-        </VForm>
-      </VCardText>
-    </VCard>
-    <VRow class="mt-4">
-      <VCol>
-        <VBtn color="success" @click="savePartnerChanges">
-          Salvar Alterações
-        </VBtn>
-      </VCol>
-    </VRow>
+    <!-- Botões -->
+    <div class="d-flex gap-4 align-center mb-4">
+      <VBtn
+        color="warning"
+        @click="$router.push('/apps/workshop/product/list')"
+      >
+        <VIcon icon="tabler-arrow-big-left-lines" />
+        Voltar
+      </VBtn>
+      <VBtn
+        color="success"
+        :disabled="!product.nome || !product.sku || !product.cor || variations.length === 0"
+        @click="updateProduct"
+      >
+        Salvar Alterações
+      </VBtn>
+    </div>
+
+    <!--
+      Reaproveitamos o mesmo componente de formulário (AddProductView)
+      para editar também.
+    -->
+    <AddProductView
+      v-model:product="product"
+      v-model:variations="variations"
+    />
   </div>
 </template>
