@@ -27,3 +27,13 @@ export interface IQueryStock {
   limit: number
   page: number
 }
+
+
+export interface VariationType {
+  id: string
+  produtoId: string
+  tamanho: string
+  estampa: string
+  sku: string
+  estoque: number
+}

@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
 import { VDataTable } from 'vuetify/labs/VDataTable'
-import { VAvatar, VChip } from 'vuetify/components'
+import { VOverlay } from 'vuetify/components'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/views/apps/workshop/product/useProduct'
 
 // Store
 const productStore = useProductStore()
 
-// Estado local para armazenar os dados dos produtos
+// Estado local
 const products = ref(productStore.products.produtos)
+const loadingProducts = ref(productStore.loadingProducts) // Estado de carregamento da store
+const overlay = ref(false) // Controle do overlay
 
 // Headers da tabela
 const headers = [
@@ -27,8 +29,11 @@ const searchQuery = ref('')
 
 // Função para resolver o status
 function resolveStatusVariant(status: string) {
-  if (status === 'ativo') return { color: 'success', text: 'Ativo' }
-  if (status === 'inativo') return { color: 'error', text: 'Inativo' }
+  if (status === 'ativo')
+    return { color: 'success', text: 'Ativo' }
+  if (status === 'inativo')
+    return { color: 'error', text: 'Inativo' }
+
   return { color: 'info', text: 'Desconhecido' }
 }
 
@@ -38,11 +43,17 @@ function formatData(data: string) {
 
 // Buscar os produtos da API na montagem do componente
 async function fetchProducts() {
+  overlay.value = true // Ativar overlay ao buscar produtos
+  loadingProducts.value = true
+
   await productStore.findAllProduct({
     status: selectedStatus.value,
     search: searchQuery.value,
   })
+
   products.value = productStore.products.produtos
+  loadingProducts.value = false
+  overlay.value = false // Desativar overlay após carregar
 }
 
 // Chamando a função de buscar produtos ao montar o componente
@@ -56,18 +67,38 @@ function deleteProduct(id: string) {
   products.value = products.value.filter(product => product.id !== id)
 }
 
+// Função para deletar uma variação
+function deleteVariation(id: string) {
+  productStore.deleteVariation(id)
+
+  // Atualizar a lista de variações localmente
+  products.value = products.value.map(produto => ({
+    ...produto,
+    variacoes: produto.variacoes.filter(variacao => variacao.variacaoId !== id),
+  }))
+}
+
 // Atualizar sempre que filtros mudarem
 watch([selectedStatus, searchQuery], fetchProducts)
+
+// Computed para verificar se não há produtos
+const noProducts = computed(() => !loadingProducts.value && products.value.length === 0)
 </script>
 
 <template>
   <div>
     <!-- Filtros -->
-    <VCard title="Filtros" class="mb-6">
+    <VCard
+      title="Filtros"
+      class="mb-6"
+    >
       <VCardText>
         <VRow>
           <!-- Buscar -->
-          <VCol cols="12" sm="8">
+          <VCol
+            cols="12"
+            sm="8"
+          >
             <AppTextField
               v-model="searchQuery"
               placeholder="Buscar pelo nome"
@@ -75,7 +106,10 @@ watch([selectedStatus, searchQuery], fetchProducts)
             />
           </VCol>
           <!-- Status -->
-          <VCol cols="12" sm="4">
+          <VCol
+            cols="12"
+            sm="4"
+          >
             <AppSelect
               v-model="selectedStatus"
               placeholder="Status"
@@ -93,18 +127,34 @@ watch([selectedStatus, searchQuery], fetchProducts)
       <VBtn
         color="primary"
         prepend-icon="tabler-plus"
+        :loading="loadingProducts"
+        :disabled="loadingProducts"
         @click="$router.push('/apps/workshop/product/add')"
       >
         Adicionar Produto
       </VBtn>
     </div>
 
+    <!-- Overlay de carregamento -->
+    <VOverlay
+      v-model="overlay"
+      class="d-flex justify-center align-center"
+    >
+      <VProgressCircular
+        indeterminate
+        size="64"
+      />
+    </VOverlay>
+
     <!-- Tabela de Produtos -->
     <VDataTable
+      v-if="!noProducts"
       :headers="headers"
       :items="products"
       :items-per-page="5"
       expand-on-click
+      :loading="loadingProducts"
+      :show-expand="item => item.variacoes.length > 0"
     >
       <!-- Linha expandida com subtabela de variações -->
       <template #expanded-row="slotProps">
@@ -112,49 +162,61 @@ watch([selectedStatus, searchQuery], fetchProducts)
           <td :colspan="headers.length">
             <div class="subtable-container">
               <h5>Variações</h5>
-              <VTable class="text-no-wrap">
+
+              <!-- Se não houver variações, exibir mensagem -->
+              <div
+                v-if="slotProps.item.raw.variacoes.length === 0"
+                class="text-center py-4"
+              >
+                <VIcon
+                  icon="tabler-info-circle"
+                  size="24"
+                  color="grey"
+                />
+                <p>Nenhuma variação disponível.</p>
+              </div>
+
+              <VTable
+                v-else
+                class="text-no-wrap"
+              >
                 <thead>
-                <tr>
-                  <th class="text-uppercase">
-                    Tamanho
-                  </th>
-                  <th class="yexy-no-wrap">
-                    Estampa
-                  </th>
-                  <th class="text-uppercase">
-                    Estoque
-                  </th>
-                  <th class="text-uppercase">
-                    SKU
-                  </th>
-                  <th class="text-uppercase">
-                    Ações
-                  </th>
-                </tr>
+                  <tr>
+                    <th class="text-uppercase">
+                      Tamanho
+                    </th>
+                    <th class="text-uppercase">
+                      Estampa
+                    </th>
+                    <th class="text-uppercase">
+                      Estoque
+                    </th>
+                    <th class="text-uppercase">
+                      SKU
+                    </th>
+                    <th class="text-uppercase">
+                      Ações
+                    </th>
+                  </tr>
                 </thead>
                 <tbody>
-                <tr
-                  v-for="item in slotProps.item.raw.variacoes"
-                  :key="item.variacaoId"
-                >
-                  <td>
-                    {{ item.tamanho  }}
-                  </td>
-                  <td>
-                    {{ item.estampa  }}
-                  </td>
-                  <td>
-                    {{  item.estoque  }}
-                  </td>
-                  <td>
-                    {{ item.sku}}
-                  </td>
-                  <td>
-                    <IconBtn color="error" @click="deleteProduct(item)">
-                      <VIcon icon="tabler-trash" />
-                    </IconBtn>
-                  </td>
-                </tr>
+                  <tr
+                    v-for="item in slotProps.item.raw.variacoes"
+                    :key="item.variacaoId"
+                  >
+                    <td>{{ item.tamanho }}</td>
+                    <td>{{ item.estampa }}</td>
+                    <td>{{ item.estoque }}</td>
+                    <td>{{ item.sku }}</td>
+                    <td>
+                      <IconBtn
+                        color="error"
+                        @click="deleteVariation(item.variacaoId)"
+                      >
+                        <VIcon icon="tabler-trash" />
+                      </IconBtn>
+                    </td>
+                  </tr>
                 </tbody>
               </VTable>
             </div>
@@ -162,7 +224,6 @@ watch([selectedStatus, searchQuery], fetchProducts)
         </tr>
       </template>
 
-      <!-- Coluna Nome -->
       <template #item.nome="{ item }">
         <div class="d-flex align-center">
           <VAvatar
@@ -178,26 +239,6 @@ watch([selectedStatus, searchQuery], fetchProducts)
         </div>
       </template>
 
-      <!-- Coluna Cor -->
-      <template #item.cor="{ item }">
-        <span>{{ item.raw.cor }}</span>
-      </template>
-
-      <!-- Coluna Status -->
-      <template #item.status="{ item }">
-        <VChip
-          :color="resolveStatusVariant(item.raw.status).color"
-          size="small"
-        >
-          {{ resolveStatusVariant(item.raw.status).text }}
-        </VChip>
-      </template>
-
-      <!-- Coluna Data -->
-      <template #item.createdAt="{ item }">
-        <span>{{ formatData(item.raw.createdAt) }}</span>
-      </template>
-
       <!-- Coluna Ações -->
       <template #item.actions="{ item }">
         <IconBtn
@@ -206,11 +247,29 @@ watch([selectedStatus, searchQuery], fetchProducts)
         >
           <VIcon icon="tabler-edit" />
         </IconBtn>
-        <IconBtn color="error" @click="deleteProduct(item.raw.id)">
+        <IconBtn
+          color="error"
+          @click="deleteProduct(item.raw.id)"
+        >
           <VIcon icon="tabler-trash" />
         </IconBtn>
       </template>
     </VDataTable>
+
+    <!-- Mensagem de Nenhum Produto -->
+    <div
+      v-else
+      class="d-flex justify-center align-center text-center"
+    >
+      <div>
+        <VIcon
+          icon="tabler-box-off"
+          size="48"
+          color="grey"
+        />
+        <p>Nenhum produto encontrado.</p>
+      </div>
+    </div>
   </div>
 </template>
 

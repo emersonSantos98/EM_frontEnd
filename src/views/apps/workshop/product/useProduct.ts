@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
-import type { IQueryProduct, ProductType } from './types'
+import type { IQueryProduct, ProductType, VariationType } from './types'
 import ProductService from '@/services/workshop/product.service'
+import VariationClient from '@/services/workshop/variation.service'
 
 export const useProductStore = defineStore('product', {
   state: () => ({
     products: {
       count: 0,
-      produtos: [] as ProductType[],
+      produtos: [] as (ProductType & { variacoes: VariationType[] })[],
     },
     loadingProducts: false,
     findOne: null as ProductType | null,
@@ -57,6 +58,28 @@ export const useProductStore = defineStore('product', {
         console.error('Erro ao atualizar produto:', error)
       }
     },
+
+    // variações
+
+    async deleteVariation(id: string) {
+      this.loadingProducts = true
+      try {
+        await new VariationClient().deleteVariation(id)
+
+        this.$patch(state => {
+          state.products.produtos.forEach(produto => {
+            produto.variacoes = produto.variacoes.filter(
+              variacao => variacao.variacaoId !== id,
+            )
+          })
+        })
+      }
+      catch (error) {
+        console.error('Erro ao deletar variação:', error)
+      }
+      this.loadingProducts = false
+    },
+
   },
 })
 
