@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { VBtn, VCard, VCardItem, VCardText, VCardTitle, VCol, VDialog, VForm, VRow, VTextField } from 'vuetify/components'
 import { useStockStore } from '@/views/apps/workshop/stock/stockStore'
-
+const isSubmitting = ref(false)
 interface Emit {
   (e: 'submit', value: any): void
   (e: 'update:isDialogVisible', value: boolean): void
@@ -38,22 +38,50 @@ const variationsWithoutStock = computed(() => {
 })
 
 // Submit logic
+// async function formSubmit() {
+//   if (selectedVariation.value && quantity.value !== null) {
+//     const payload = {
+//       estoque: {
+//         variacaoId: selectedVariation.value,
+//       },
+//       movimentacao: {
+//         tipo: movementType.value,
+//         quantidade: quantity.value,
+//         descricao: description.value,
+//       },
+//     }
+//
+//     await stockStore.addStock(payload)
+//     stockStore.fetchStock({ status: 'ativo', limit: 10, page: 1 })
+//     emit('update:isDialogVisible', false)
+//   }
+//   else {
+//     console.error('Preencha todos os campos obrigatórios.')
+//   }
+// }
+
+// Update the submit function
 async function formSubmit() {
   if (selectedVariation.value && quantity.value !== null) {
-    const payload = {
-      estoque: {
-        variacaoId: selectedVariation.value,
-      },
-      movimentacao: {
-        tipo: movementType.value,
-        quantidade: quantity.value,
-        descricao: description.value,
-      },
-    }
+    isSubmitting.value = true
+    try {
+      const payload = {
+        estoque: {
+          variacaoId: selectedVariation.value,
+        },
+        movimentacao: {
+          tipo: movementType.value,
+          quantidade: quantity.value,
+          descricao: description.value,
+        },
+      }
 
-    await stockStore.addStock(payload)
-    stockStore.fetchStock({ status: 'ativo', limit: 10, page: 1 })
-    emit('update:isDialogVisible', false)
+      await stockStore.addStock(payload)
+      await stockStore.fetchStock({ status: 'ativo', limit: 10, page: 1 })
+      emit('update:isDialogVisible', false)
+    } finally {
+      isSubmitting.value = false
+    }
   }
   else {
     console.error('Preencha todos os campos obrigatórios.')
@@ -116,7 +144,7 @@ watch(() => props.isDialogVisible, newVal => {
             >
               <VSelect
                 v-model="selectedVariation"
-                :items="variationsWithoutStock.map(v => ({ text: `${v.cor} - ${v.tamanho}`, value: v.id }))"
+                :items="variationsWithoutStock.map(v => ({ text: `Estampa: ${v.estampa} - ${v.tamanho}`, value: v.id }))"
                 label="Variação"
                 item-title="text"
                 placeholder="Selecione uma variação"
@@ -158,6 +186,8 @@ watch(() => props.isDialogVisible, newVal => {
               <VBtn
                 class="me-3"
                 type="submit"
+                :loading="isSubmitting"
+                :disabled="isSubmitting"
               >
                 Cadastrar
               </VBtn>
