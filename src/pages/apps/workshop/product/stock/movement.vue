@@ -144,16 +144,6 @@ async function submitForm() {
                 </VListItem>
               </template>
             </VAutocomplete>
-            <!--            inventoryStore.list  {{ inventoryStore.list }} -->
-            <!--            <VAutocomplete -->
-            <!--              v-model="form.estoqueId" -->
-            <!--              :items="inventoryStore.list.map(item => ({ value: item.estoqueId, text: `${item.nome}-Estampa:${item.estampa}-Tamanho:${item.tamanho}` }))" -->
-            <!--              label="ID do Estoque" -->
-            <!--              placeholder="Selecione" -->
-            <!--              item-title="text" -->
-            <!--              item-value="value" -->
-            <!--              required -->
-            <!--            /> -->
           </VCol>
 
           <!-- Botões -->
