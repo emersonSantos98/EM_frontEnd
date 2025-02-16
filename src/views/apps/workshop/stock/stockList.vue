@@ -125,7 +125,7 @@ onMounted(() => {
                 class="mb-2"
               >
                 <strong>
-                  {{ variacao.cor }} - {{ variacao.tamanho }}
+                  Estampa: {{ variacao.estampa }} - {{ variacao.tamanho }}
                 </strong>
                 <span>
                   Estoque: {{ variacao.quantidade }}
