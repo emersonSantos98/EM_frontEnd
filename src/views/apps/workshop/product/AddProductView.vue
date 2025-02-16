@@ -31,17 +31,20 @@ watch(
   newImage => {
     if (!newImage) {
       selectedImage.value = null
-    } else if (newImage instanceof File) {
+    }
+    else if (newImage instanceof File) {
       const reader = new FileReader()
+
       reader.onload = () => {
         selectedImage.value = reader.result as string
       }
       reader.readAsDataURL(newImage)
-    } else if (typeof newImage === 'string') {
+    }
+    else if (typeof newImage === 'string') {
       selectedImage.value = newImage
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Upload de imagem com pré-visualização
@@ -53,13 +56,20 @@ function handleImageUpload(event: Event) {
     props.product.imagem = file
 
     const reader = new FileReader()
+
     reader.onload = () => {
       selectedImage.value = reader.result as string
     }
     reader.readAsDataURL(file)
-
-    emit('update:product', { ...props.product })
   }
+
+  // Only emit update if there's a new file
+  emit('update:product', {
+    ...props.product,
+
+    // Only include image in payload if it was changed
+    imagem: fileInput.files?.[0] || props.product.imagem,
+  })
 }
 
 // Adiciona uma nova variação ao produto
@@ -92,31 +102,80 @@ function removeVariation(index: number) {
           <VCardText>
             <VRow>
               <!-- Nome -->
-              <VCol cols="12" md="6">
-                <VTextField v-model="props.product.nome" label="Nome do Produto" outlined @input="emit('update:product', { ...props.product })" />
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="props.product.nome"
+                  label="Nome do Produto"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
+                />
               </VCol>
 
               <!-- SKU -->
-              <VCol cols="12" md="6">
-                <VTextField v-model="props.product.sku" label="SKU" outlined @input="emit('update:product', { ...props.product })" />
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="props.product.sku"
+                  label="SKU"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
+                />
               </VCol>
 
               <!-- Cor -->
-              <VCol cols="12" md="6">
-                <VTextField v-model="props.product.cor" label="Cor" outlined @input="emit('update:product', { ...props.product })" />
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VTextField
+                  v-model="props.product.cor"
+                  label="Cor"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
+                />
               </VCol>
 
               <!-- Descrição -->
               <VCol cols="12">
-                <VTextarea v-model="props.product.descricao" label="Descrição do Produto" rows="4" outlined @input="emit('update:product', { ...props.product })" />
+                <VTextarea
+                  v-model="props.product.descricao"
+                  label="Descrição do Produto"
+                  rows="4"
+                  outlined
+                  @input="emit('update:product', { ...props.product })"
+                />
               </VCol>
 
               <!-- Upload de Imagem -->
-              <VCol cols="12" md="6">
-                <label for="productImage" class="mb-2 d-block">Imagem do Produto</label>
-                <VFileInput id="productImage" label="Selecione uma imagem" accept="image/*" outlined @change="handleImageUpload" />
-                <div v-if="selectedImage" class="mt-4 text-center">
-                  <img :src="selectedImage" alt="Pré-visualização" class="preview-image" />
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <label
+                  for="productImage"
+                  class="mb-2 d-block"
+                >Imagem do Produto</label>
+                <VFileInput
+                  id="productImage"
+                  label="Selecione uma imagem"
+                  accept="image/*"
+                  outlined
+                  @change="handleImageUpload"
+                />
+                <div
+                  v-if="selectedImage"
+                  class="mt-4 text-center"
+                >
+                  <img
+                    :src="selectedImage"
+                    alt="Pré-visualização"
+                    class="preview-image"
+                  >
                 </div>
               </VCol>
             </VRow>
@@ -127,37 +186,85 @@ function removeVariation(index: number) {
         <VCard class="mb-6">
           <VCardTitle>Variações</VCardTitle>
           <VCardText>
-            <VRow v-for="(variation, index) in props.variations" :key="index" class="align-center mb-3">
+            <VRow
+              v-for="(variation, index) in props.variations"
+              :key="index"
+              class="align-center mb-3"
+            >
               <!-- Tamanho -->
-              <VCol cols="12" md="3">
-                <VAutocomplete v-model="variation.tamanho" label="Tamanho" :items="['P', 'M', 'G', 'GG']" outlined />
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VAutocomplete
+                  v-model="variation.tamanho"
+                  label="Tamanho"
+                  :items="['P', 'M', 'G', 'GG']"
+                  outlined
+                />
               </VCol>
 
               <!-- Estampa -->
-              <VCol cols="12" md="3">
-                <VAutocomplete v-model="variation.estampa" label="Estampa" :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']" outlined />
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VAutocomplete
+                  v-model="variation.estampa"
+                  label="Estampa"
+                  :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']"
+                  outlined
+                />
               </VCol>
 
               <!-- Estoque -->
-              <VCol cols="12" md="3">
-                <VTextField v-model="variation.estoque" label="Estoque" type="number" outlined />
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VTextField
+                  v-model="variation.estoque"
+                  label="Estoque"
+                  type="number"
+                  outlined
+                />
               </VCol>
 
               <!-- SKU da variação -->
-              <VCol cols="12" md="3">
-                <VTextField v-model="variation.sku" label="SKU da Variação" outlined />
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <VTextField
+                  v-model="variation.sku"
+                  label="SKU da Variação"
+                  outlined
+                />
               </VCol>
 
               <!-- Remover -->
-              <VCol cols="12" class="d-flex justify-end">
-                <VBtn icon color="error" @click="removeVariation(index)">
+              <VCol
+                cols="12"
+                class="d-flex justify-end"
+              >
+                <VBtn
+                  icon
+                  color="error"
+                  @click="removeVariation(index)"
+                >
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </VCol>
             </VRow>
 
             <!-- Botão para adicionar variação -->
-            <VBtn color="primary" class="mt-4" @click="addVariation">Adicionar Variação</VBtn>
+            <VBtn
+              color="primary"
+              class="mt-4"
+              @click="addVariation"
+            >
+              Adicionar Variação
+            </VBtn>
           </VCardText>
         </VCard>
       </VCol>
