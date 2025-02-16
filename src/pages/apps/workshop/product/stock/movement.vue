@@ -4,7 +4,7 @@ import { useInventoryStore } from '@/views/apps/workshop/stock/inventoryMovement
 
 const inventoryStore = useInventoryStore()
 const currentTab = ref('entrada')
-
+const isLoading = ref(false)
 // Formulário inicial
 const form = ref({
   tipo: 'entrada',
@@ -45,8 +45,9 @@ function getCurrentDateTime() {
 // Envia os dados do formulário
 async function submitForm() {
   try {
-    form.value.tipo = currentTab.value // Define o tipo com base na aba ativa
-    form.value.dataMovimentacao = getCurrentDateTime() // Define a data e hora atual
+    isLoading.value = true
+    form.value.tipo = currentTab.value
+    form.value.dataMovimentacao = getCurrentDateTime()
 
     await inventoryStore.addMovement(form.value)
     resetForm()
@@ -54,6 +55,9 @@ async function submitForm() {
   catch (error) {
     console.error('Erro ao salvar movimentação:', error)
     alert('Erro ao salvar movimentação.')
+  }
+  finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -154,6 +158,7 @@ async function submitForm() {
             <VBtn
               type="submit"
               color="primary"
+              :loading="isLoading"
             >
               Salvar
             </VBtn>
