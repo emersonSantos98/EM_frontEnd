@@ -20,7 +20,6 @@ export default class StockService {
     this.store.loadingStock = true
     try {
       const res = await this.client.findAll(query)
-
       this.store.products = res.data.data
     }
     catch (err: any) {
