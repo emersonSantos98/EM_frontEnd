@@ -18,7 +18,7 @@ const props = defineProps({
 const emit = defineEmits(['update:product', 'update:variations'])
 
 // Preview da imagem (string base64 ou URL)
-const selectedImage = ref<string | null>(null)
+const selectedImage = ref<string | null>(props.product.imagem ?? null)
 
 /**
  * Observa "props.product.imagem".
@@ -32,18 +32,16 @@ watch(
     if (!newImage) {
       selectedImage.value = null
     } else if (newImage instanceof File) {
-      // Faz a leitura do File para exibir base64
       const reader = new FileReader()
       reader.onload = () => {
         selectedImage.value = reader.result as string
       }
       reader.readAsDataURL(newImage)
     } else if (typeof newImage === 'string') {
-      // Se for string, consideramos que é a URL/caminho da imagem antiga
       selectedImage.value = newImage
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 // Upload de imagem com pré-visualização
@@ -52,25 +50,21 @@ function handleImageUpload(event: Event) {
   if (fileInput.files && fileInput.files[0]) {
     const file = fileInput.files[0]
 
-    // Seta no product como File
     props.product.imagem = file
 
-    // Gera pré-visualização
     const reader = new FileReader()
     reader.onload = () => {
       selectedImage.value = reader.result as string
     }
     reader.readAsDataURL(file)
 
-    // Emite para o pai
     emit('update:product', { ...props.product })
   }
 }
 
-// Adiciona uma nova variação (sem ID!)
+// Adiciona uma nova variação ao produto
 function addVariation() {
   const newVariation: IQueryVariation = {
-    // Não define id => variação nova
     tamanho: '',
     estampa: '',
     estoque: 0,
@@ -98,83 +92,31 @@ function removeVariation(index: number) {
           <VCardText>
             <VRow>
               <!-- Nome -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="props.product.nome"
-                  label="Nome do Produto"
-                  outlined
-                  @input="emit('update:product', { ...props.product })"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="props.product.nome" label="Nome do Produto" outlined @input="emit('update:product', { ...props.product })" />
               </VCol>
 
               <!-- SKU -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="props.product.sku"
-                  label="SKU"
-                  outlined
-                  @input="emit('update:product', { ...props.product })"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="props.product.sku" label="SKU" outlined @input="emit('update:product', { ...props.product })" />
               </VCol>
 
               <!-- Cor -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="props.product.cor"
-                  label="Cor"
-                  outlined
-                  @input="emit('update:product', { ...props.product })"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="props.product.cor" label="Cor" outlined @input="emit('update:product', { ...props.product })" />
               </VCol>
 
               <!-- Descrição -->
               <VCol cols="12">
-                <VTextarea
-                  v-model="props.product.descricao"
-                  label="Descrição do Produto"
-                  rows="4"
-                  outlined
-                  @input="emit('update:product', { ...props.product })"
-                />
+                <VTextarea v-model="props.product.descricao" label="Descrição do Produto" rows="4" outlined @input="emit('update:product', { ...props.product })" />
               </VCol>
 
               <!-- Upload de Imagem -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <label
-                  for="productImage"
-                  class="mb-2 d-block"
-                >
-                  Imagem do Produto
-                </label>
-                <VFileInput
-                  id="productImage"
-                  label="Selecione uma imagem"
-                  accept="image/*"
-                  outlined
-                  @change="handleImageUpload"
-                />
-                <!-- Pré-visualização da Imagem (pode ser base64 ou URL) -->
-                <div
-                  v-if="selectedImage"
-                  class="mt-4 text-center"
-                >
-                  <img
-                    :src="selectedImage"
-                    alt="Pré-visualização"
-                    class="preview-image"
-                  >
+              <VCol cols="12" md="6">
+                <label for="productImage" class="mb-2 d-block">Imagem do Produto</label>
+                <VFileInput id="productImage" label="Selecione uma imagem" accept="image/*" outlined @change="handleImageUpload" />
+                <div v-if="selectedImage" class="mt-4 text-center">
+                  <img :src="selectedImage" alt="Pré-visualização" class="preview-image" />
                 </div>
               </VCol>
             </VRow>
@@ -185,48 +127,25 @@ function removeVariation(index: number) {
         <VCard class="mb-6">
           <VCardTitle>Variações</VCardTitle>
           <VCardText>
-            <VRow
-              v-for="(variation, index) in props.variations"
-              :key="index"
-              class="align-center mb-3"
-            >
+            <VRow v-for="(variation, index) in props.variations" :key="index" class="align-center mb-3">
               <!-- Tamanho -->
               <VCol cols="12" md="3">
-                <VAutocomplete
-                  v-model="variation.tamanho"
-                  label="Tamanho"
-                  :items="['P', 'M', 'G', 'GG']"
-                  outlined
-                />
+                <VAutocomplete v-model="variation.tamanho" label="Tamanho" :items="['P', 'M', 'G', 'GG']" outlined />
               </VCol>
 
               <!-- Estampa -->
               <VCol cols="12" md="3">
-                <VAutocomplete
-                  v-model="variation.estampa"
-                  label="Estampa"
-                  :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']"
-                  outlined
-                />
+                <VAutocomplete v-model="variation.estampa" label="Estampa" :items="['Lisa', 'Listrado', 'Floral', 'Xadrez']" outlined />
               </VCol>
 
               <!-- Estoque -->
               <VCol cols="12" md="3">
-                <VTextField
-                  v-model="variation.estoque"
-                  label="Estoque"
-                  type="number"
-                  outlined
-                />
+                <VTextField v-model="variation.estoque" label="Estoque" type="number" outlined />
               </VCol>
 
               <!-- SKU da variação -->
               <VCol cols="12" md="3">
-                <VTextField
-                  v-model="variation.sku"
-                  label="SKU da Variação"
-                  outlined
-                />
+                <VTextField v-model="variation.sku" label="SKU da Variação" outlined />
               </VCol>
 
               <!-- Remover -->
@@ -238,9 +157,7 @@ function removeVariation(index: number) {
             </VRow>
 
             <!-- Botão para adicionar variação -->
-            <VBtn color="primary" class="mt-4" @click="addVariation">
-              Adicionar Variação
-            </VBtn>
+            <VBtn color="primary" class="mt-4" @click="addVariation">Adicionar Variação</VBtn>
           </VCardText>
         </VCard>
       </VCol>
