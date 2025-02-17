@@ -53,6 +53,16 @@ export const useDashboardStore = defineStore('dashboard', {
         minStock: 10,
         status: 'Baixo Estoque',
       },
+      {
+        id: 3,
+        name: 'Tênis Casual',
+        totalMovements: 75,
+        topVariation: '42',
+        currentStock: 5,
+        maxStock: 30,
+        minStock: 5,
+        status: 'Risco de Falta',
+      },
     ],
     nextMonth: 'Julho 2023',
     stockProjections: [
@@ -73,6 +83,15 @@ export const useDashboardStore = defineStore('dashboard', {
         trend: 'up',
         reason: 'Entrada da estação fria aumenta demanda',
         status: 'Estoque Adequado',
+      },
+      {
+        product: 'Tênis Casual',
+        currentStock: 5,
+        projectedStock: 2,
+        minStock: 5,
+        trend: 'down',
+        reason: 'Baixa procura no inverno',
+        status: 'Risco de Falta',
       },
     ],
     seasonalEvents: [
