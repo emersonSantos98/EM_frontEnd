@@ -1,7 +1,9 @@
 <template>
   <div>
-    <h1>Home</h1>
-    <p>Welcome to your Nuxt.js application!</p>
+    <DashboardView />
   </div>
 </template>
 
+<script setup>
+import DashboardView from '@/views/dashboard/DashboardView.vue'
+</script>
